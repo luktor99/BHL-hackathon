@@ -47,7 +47,9 @@ class LEDDriver {
 public:
   LEDDriver();
 
-  void next_wave_step(int hue);
+  void single_blink(int ms);
+  void double_blink(int ms);
+  void next_rainbow_step(int hue);
   void battery_level(int level);
   
 private:
@@ -61,7 +63,19 @@ LEDDriver::LEDDriver() {
   FastLED.addLeds<WS2812, LED_DATA_PIN>(leds, NUM_LEDS);
 }
 
-void LEDDriver::next_wave_step(int hue) {
+void LEDDriver::single_blink(int ms) {
+  set_first(1, LEDColour::GREEN);
+  delay(ms);
+  set_first(0, 0);
+  delay(ms);
+}
+
+void LEDDriver::double_blink(int ms) {
+  single_blink(ms);
+  single_blink(ms);
+}
+
+void LEDDriver::next_rainbow_step(int hue) {
   int sector_size = 255 / 4;
   
   for(int i = 0; i < NUM_LEDS; i++) {   
@@ -100,6 +114,17 @@ void LEDDriver::set_first(int count, int hue) {
   FastLED.show();
 }
 
+// MelkaState.h ///////////////////////////////////////////////////////////
+enum class MelkaState {
+  INITIALIZE,
+  WAIT_FOR_MASTER,
+  MASTER_CONNECTED,
+  GAME_INITIALIZATION,
+  GAME,
+  AFTER_GAME
+};
+MelkaState melka_state = MelkaState::INITIALIZE;
+
 // WiFiDriver.h ///////////////////////////////////////////////////////////
 #include <WiFi.h>
 const char *ssid = "Melka";
@@ -118,10 +143,31 @@ namespace APIVariable {
 }
 
 namespace APIFunction {
-  int control(String cmd) {
-    Serial.print("API cmd = ");
-    Serial.println(cmd);
-    return 1;
+  int register_master(String) {
+    if (melka_state != MelkaState::WAIT_FOR_MASTER) {
+      Serial.println("APIFunction::register_master bad state");
+      return 1;
+    }
+    
+    melka_state = MelkaState::MASTER_CONNECTED;
+    return 0;
+  }
+
+  int game(String cmd) {
+    if (melka_state != MelkaState::GAME_INITIALIZATION) {
+      Serial.println("APIFunction::game bad state");
+      return 1;
+    }
+
+    int player_cnt = cmd[0] - '0';
+    Serial.print("players = ");
+    Serial.print(player_cnt);
+    Serial.print(" game = ");
+    String game = cmd.substring(1, cmd.length());
+    Serial.println(game);
+    
+    melka_state = MelkaState::GAME;
+    return 0;    
   }
 }
 
@@ -145,7 +191,9 @@ void API::configure() {
   rest.variable("state", &APIVariable::state);
   rest.variable("temperature", &APIVariable::temperature);
   rest.variable("nick", &APIVariable::nick);
-  rest.function((char*)"control", APIFunction::control);
+  
+  rest.function((char*)"register", APIFunction::register_master);
+  rest.function((char*)"game", APIFunction::game);
 
   rest.set_id("123456");
   rest.set_name((char*)"Melka");
@@ -178,16 +226,7 @@ void setup() {
   server.begin();
 }
 
-enum class MelkaState {
-  INITIALIZE,
-  WAIT_FOR_MASTER,
-  WAIT_FOR_PLAYERS,
-  GAME,
-  AFTER_GAME
-};
-
 static uint8_t hue = 0;
-MelkaState melka_state = MelkaState::INITIALIZE;
 void loop() {
   api.handle_request(server);
 
@@ -203,14 +242,26 @@ void loop() {
       break;
     case MelkaState::WAIT_FOR_MASTER:
       Serial.println("WAIT_FOR_MASTER");
-      led_driver.next_wave_step(hue);
-      hue += 15;
-//        led_driver.battery_level(1);
-      // waitForServerRequest?
+      // TODO get real battery level
+      led_driver.battery_level(1);
       break;
-    case MelkaState::WAIT_FOR_PLAYERS:
+    case MelkaState::MASTER_CONNECTED:
+      Serial.println("MASTER_CONNECTED");
+      led_driver.single_blink(1000);
+      led_driver.double_blink(200);
+      // TODO get real battery level
+      led_driver.battery_level(1);
+      melka_state = MelkaState::GAME_INITIALIZATION;
+      break;
+    case MelkaState::GAME_INITIALIZATION:
+      Serial.println("GAME_INITIALIZATION");
+      led_driver.next_rainbow_step(hue);
+      hue += 10;
       break;
     case MelkaState::GAME:
+      Serial.println("GAME");
+      led_driver.next_rainbow_step(hue);
+      hue += 60;
       break;
     case MelkaState::AFTER_GAME:
       break;
