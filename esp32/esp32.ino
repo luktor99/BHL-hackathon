@@ -75,8 +75,6 @@ WiFiServer server(80);
 // API.h /////////////////////////////////////////////////////////////////
 #include <aREST.h>
 
-aREST rest = aREST();
-
 namespace APIVariable {
   bool state = true;
   int temperature = 25;
@@ -91,20 +89,52 @@ namespace APIFunction {
   }
 }
 
+class API {
+public:
+  API();
+
+  void configure();
+  void handleRequest(WiFiServer &server);
+  
+private:
+  aREST rest;
+};
+
+// API.cpp ///////////////////////////////////////////////////////////////
+API::API()
+  : rest(aREST())
+{}
+
+void API::configure() {
+  rest.variable("state", &APIVariable::state);
+  rest.variable("temperature", &APIVariable::temperature);
+  rest.variable("nick", &APIVariable::nick);
+  rest.function((char*)"control", APIFunction::control);
+
+  rest.set_id("123456");
+  rest.set_name((char*)"Melka");
+}
+
+void API::handleRequest(WiFiServer &server) {
+  WiFiClient client = server.available();
+  if (!client)
+    return;
+  
+  while(!client.available()){
+    delay(1);
+  }
+  rest.handle(client);
+}
+
 // code //////////////////////////////////////////////////////////////////
 DistanceSensor distance_sensor_1(DISTANCE_PIN_1, 1000);
 LEDDriver led_driver;
+API api;
 
 void setup() {
   Serial.begin(115200);  
   
-  rest.variable("state",&APIVariable::state);
-  rest.variable("temperature",&APIVariable::temperature);
-  rest.variable("nick",&APIVariable::nick);
-  rest.function((char*)"control",APIFunction::control);
-
-  rest.set_id("1");
-  rest.set_name((char*)"Melka");
+  api.configure();
 
   WiFi.softAP(ssid, password);
   Serial.print("IP address: ");
@@ -123,41 +153,37 @@ enum class MelkaState {
 static uint8_t hue = 0;
 MelkaState melka_state = MelkaState::INITIALIZE;
 void loop() {
-  // Handle REST calls
-  WiFiClient client = server.available();
-  if (client) {
-    while(!client.available()){
-      delay(1);
+  api.handleRequest(server);
+
+  static unsigned long last_time = millis();
+  if (millis() - last_time > 500) {
+    last_time = millis();
+
+    Serial.println("Slow loop iteration:");
+    switch(melka_state) {
+    case MelkaState::INITIALIZE:
+      Serial.println("INITIALIZE");
+      melka_state = MelkaState::WAIT_FOR_MASTER;  
+      break;
+    case MelkaState::WAIT_FOR_MASTER:
+      Serial.println("WAIT_FOR_MASTER");
+//      led_driver.nextWaveStep(hue);
+      hue += 10;
+      // waitForServerRequest?
+      break;
+    case MelkaState::WAIT_FOR_PLAYERS:
+      break;
+    case MelkaState::GAME:
+      break;
+    case MelkaState::AFTER_GAME:
+      break;
     }
-    rest.handle(client);
+    
+    int value = distance_sensor_1.get_voltage();
+    bool isActive = distance_sensor_1.is_activated();
+    Serial.print("distance_sensor_1: value = ");
+    Serial.print(value);
+    Serial.print(" is_activated = ");
+    Serial.println(isActive);
   }
-  
-//  Serial.println("Slow loop iteration:");
-//  switch(melka_state) {
-//  case MelkaState::INITIALIZE:
-//    Serial.println("INITIALIZE");
-//    melka_state = MelkaState::WAIT_FOR_MASTER;  
-//    break;
-//  case MelkaState::WAIT_FOR_MASTER:
-//    Serial.println("WAIT_FOR_MASTER");
-//    led_driver.nextWaveStep(hue);
-//    hue += 10;
-//    // waitForServerRequest?
-//    break;
-//  case MelkaState::WAIT_FOR_PLAYERS:
-//    break;
-//  case MelkaState::GAME:
-//    break;
-//  case MelkaState::AFTER_GAME:
-//    break;
-//  }
-//  
-//  int value = distance_sensor_1.get_voltage();
-//  bool isActive = distance_sensor_1.is_activated();
-//  Serial.print("distance_sensor_1: value = ");
-//  Serial.print(value);
-//  Serial.print(" is_activated = ");
-//  Serial.println(isActive);
-//
-//  delay(1000);
 }
