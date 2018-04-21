@@ -36,14 +36,24 @@ bool DistanceSensor::is_activated() const {
 #define LED_DATA_PIN 23 
 #define NUM_LEDS 10
 
+namespace LEDColour {
+  int RED = 0;
+  int YELLOW = 42;
+  int GREEN = 85;
+  int BLUE = 171;
+}
+
 class LEDDriver {
 public:
   LEDDriver();
 
-  void nextWaveStep(int hue);
+  void next_wave_step(int hue);
+  void battery_level(int level);
   
 private:
   CRGBArray<NUM_LEDS> leds;
+
+  void set_first(int count, int hue);
 };
 
 // LEDDriver.cpp /////////////////////////////////////////////////////////
@@ -51,18 +61,42 @@ LEDDriver::LEDDriver() {
   FastLED.addLeds<WS2812, LED_DATA_PIN>(leds, NUM_LEDS);
 }
 
-void LEDDriver::nextWaveStep(int hue) {
+void LEDDriver::next_wave_step(int hue) {
   int sector_size = 255 / 4;
   
   for(int i = 0; i < NUM_LEDS; i++) {   
-    // fade everything out
-//    leds.fadeToBlackBy(40);
-
     if (i < 1)
       leds[i] = CHSV(i * sector_size + hue,255,255);
     else
       leds[i] = CHSV(0, 0, 0);
   } 
+  FastLED.show();
+}
+
+void LEDDriver::battery_level(int level) {
+  int colour;
+  switch(level) {
+  case 1:
+    set_first(1, LEDColour::RED);
+    break;
+  case 2:
+    set_first(2, LEDColour::YELLOW);
+    break;
+  case 3:
+    set_first(3, LEDColour::BLUE);
+    break;
+  case 4:
+    set_first(4, LEDColour::GREEN);
+    break;
+  }
+}
+
+void LEDDriver::set_first(int count, int hue) {
+  int cnt = 0;
+  for (;cnt < count; ++cnt)
+    leds[cnt] = CHSV(hue,255,255);
+  for (;cnt < NUM_LEDS; ++cnt)
+    leds[cnt] = CHSV(0,0,0);
   FastLED.show();
 }
 
@@ -96,7 +130,7 @@ public:
   API();
 
   void configure();
-  void handleRequest(WiFiServer &server);
+  void handle_request(WiFiServer &server);
   
 private:
   aREST rest;
@@ -117,7 +151,7 @@ void API::configure() {
   rest.set_name((char*)"Melka");
 }
 
-void API::handleRequest(WiFiServer &server) {
+void API::handle_request(WiFiServer &server) {
   WiFiClient client = server.available();
   if (!client)
     return;
@@ -155,7 +189,7 @@ enum class MelkaState {
 static uint8_t hue = 0;
 MelkaState melka_state = MelkaState::INITIALIZE;
 void loop() {
-  api.handleRequest(server);
+  api.handle_request(server);
 
   static unsigned long last_time = millis();
   if (millis() - last_time > 500) {
@@ -169,8 +203,9 @@ void loop() {
       break;
     case MelkaState::WAIT_FOR_MASTER:
       Serial.println("WAIT_FOR_MASTER");
-      led_driver.nextWaveStep(hue);
-      hue += 10;
+      led_driver.next_wave_step(hue);
+      hue += 15;
+//        led_driver.battery_level(1);
       // waitForServerRequest?
       break;
     case MelkaState::WAIT_FOR_PLAYERS:
