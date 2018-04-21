@@ -203,7 +203,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 4
   m_Spacing: 0
-  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 1
@@ -241,7 +241,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 299.5, y: -22.330002}
+  m_AnchoredPosition: {x: 332.5, y: -22.330002}
   m_SizeDelta: {x: 100, y: 44.660004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &35509263
@@ -589,7 +589,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0.4724486, g: 0.878, b: 0.23975, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -597,10 +597,10 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 9c60953503f42ec41a755f155fc9ffea, type: 3}
     m_FontSize: 300
     m_FontStyle: 0
-    m_BestFit: 1
+    m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 300
     m_Alignment: 4
@@ -609,7 +609,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Wyb\xF3r gry"
+  m_Text: Game
 --- !u!222 &94108563
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -682,6 +682,10 @@ Prefab:
     - target: {fileID: 400000, guid: e9f1e65c3ee582244a96217858f5333a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.941
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: e9f1e65c3ee582244a96217858f5333a, type: 3}
+      propertyPath: m_Name
+      value: NrOfPlayersScreen
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e9f1e65c3ee582244a96217858f5333a, type: 3}
@@ -876,7 +880,7 @@ MonoBehaviour:
   mPreserveChildSize: 0
   mInitializedInEditor: 1
   mDataSetPath: Vuforia/BHL.xml
-  mExtendedTracking: 0
+  mExtendedTracking: 1
   mAspectRatio: 1
   mImageTargetType: 0
   mWidth: 1
@@ -957,13 +961,13 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 584251257}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -1247,7 +1251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 1
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -1378,7 +1382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 1
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -1856,7 +1860,7 @@ GameObject:
   - component: {fileID: 1355430818}
   - component: {fileID: 1355430817}
   m_Layer: 5
-  m_Name: Button1
+  m_Name: PictionaryButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1912,7 +1916,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 1
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -2021,7 +2025,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0.4724486, g: 0.878, b: 0.23975, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2029,10 +2033,10 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 9c60953503f42ec41a755f155fc9ffea, type: 3}
     m_FontSize: 300
     m_FontStyle: 0
-    m_BestFit: 1
+    m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 300
     m_Alignment: 4
@@ -2041,7 +2045,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Liczba graczy
+  m_Text: Players
 --- !u!222 &1405575225
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2191,7 +2195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 1
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -2396,7 +2400,7 @@ GameObject:
   - component: {fileID: 1537243313}
   - component: {fileID: 1537243312}
   m_Layer: 5
-  m_Name: Button2
+  m_Name: ReflexButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2452,7 +2456,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 1
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -2576,7 +2580,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1562805893}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
@@ -2883,7 +2887,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 1
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -3136,7 +3140,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0.001
+  m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -3210,7 +3214,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: e9f1e65c3ee582244a96217858f5333a, type: 3}
       propertyPath: m_Name
-      value: VerticalScreen (1)
+      value: GameChoiceScreen
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e9f1e65c3ee582244a96217858f5333a, type: 3}
@@ -3253,7 +3257,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 99.5, y: -22.330002}
+  m_AnchoredPosition: {x: 66.5, y: -22.330002}
   m_SizeDelta: {x: 100, y: 44.660004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2127462171
