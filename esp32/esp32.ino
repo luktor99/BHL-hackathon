@@ -30,6 +30,7 @@ bool DistanceSensor::is_activated() const {
 }
 
 // LEDDriver.h ///////////////////////////////////////////////////////////
+// libraries => git@github.com:samguyer/FastLED.git
 #include <FastLED.h>
 
 #define LED_DATA_PIN 23 
@@ -57,7 +58,7 @@ void LEDDriver::nextWaveStep(int hue) {
     // fade everything out
 //    leds.fadeToBlackBy(40);
 
-    if (i < 4)
+    if (i < 1)
       leds[i] = CHSV(i * sector_size + hue,255,255);
     else
       leds[i] = CHSV(0, 0, 0);
@@ -73,6 +74,7 @@ const char *password = "87654321";
 WiFiServer server(80);
 
 // API.h /////////////////////////////////////////////////////////////////
+// libraries => https://github.com/marcoschwartz/aREST
 #include <aREST.h>
 
 namespace APIVariable {
@@ -167,7 +169,7 @@ void loop() {
       break;
     case MelkaState::WAIT_FOR_MASTER:
       Serial.println("WAIT_FOR_MASTER");
-//      led_driver.nextWaveStep(hue);
+      led_driver.nextWaveStep(hue);
       hue += 10;
       // waitForServerRequest?
       break;
