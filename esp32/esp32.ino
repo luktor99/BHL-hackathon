@@ -1,3 +1,52 @@
+// ADCDriver.h ////////////////////////////////////////////////////////////
+#define BATTERY_PIN 32
+
+class ADCDriver {
+public:
+  ADCDriver(int pin);
+  
+  int get_voltage() const;
+  
+private:
+  const int pin;
+};
+
+// ADCDriver.cpp //////////////////////////////////////////////////////////
+ADCDriver::ADCDriver(int pin)
+  : pin(pin)
+{}
+
+int ADCDriver::get_voltage() const {
+  return analogRead(pin);
+}
+
+// Battery.h //////////////////////////////////////////////////////////////
+class Battery {
+public:
+  Battery(int pin);
+
+  int get_level() const;
+  
+private:
+  ADCDriver adc_driver;
+};
+
+// Battery.cpp ////////////////////////////////////////////////////////////
+Battery::Battery(int pin)
+  : adc_driver(pin)
+{}
+
+int Battery::get_level() const {
+  int voltage = adc_driver.get_voltage();
+  if (voltage < 3.3)
+    return 1;
+  if (voltage < 3.58)
+    return 2;
+  if (voltage < 3.87)
+    return 3;
+  return 4;
+}
+
 // DistanceSensor.h ///////////////////////////////////////////////////////
 #define DISTANCE_PIN_1 36
 #define DISTANCE_PIN_2 39
@@ -8,25 +57,21 @@ class DistanceSensor {
 public:
   DistanceSensor(int pin, int activation_threashold);
   
-  int get_voltage() const;
   bool is_activated() const;
   
 private:
-  const int pin;
+  ADCDriver adc_driver;
   const int activation_threashold;
 };
 
-// DistanceSensor.cpp ////////////////////////////////////////////////////
+// DistanceSensor.cpp ////////////////////////////////////////////////////'
 DistanceSensor::DistanceSensor(int pin, int activation_threashold)
-  : pin(pin), activation_threashold(activation_threashold)
+  : adc_driver(pin),
+  activation_threashold(activation_threashold)
 {}
 
-int DistanceSensor::get_voltage() const {
-  return analogRead(pin);
-}
-
 bool DistanceSensor::is_activated() const {
-  return get_voltage() > activation_threashold;
+  return adc_driver.get_voltage() > activation_threashold;
 }
 
 // LEDDriver.h ///////////////////////////////////////////////////////////
@@ -34,7 +79,7 @@ bool DistanceSensor::is_activated() const {
 #include <FastLED.h>
 
 #define LED_DATA_PIN 23 
-#define NUM_LEDS 10
+#define NUM_LEDS 4
 
 namespace LEDColour {
   int RED = 0;
@@ -47,8 +92,8 @@ class LEDDriver {
 public:
   LEDDriver();
 
-  void single_blink(int ms);
-  void double_blink(int ms);
+  void single_blink(int ms, int hue);
+  void double_blink(int ms, int hue);
   void next_rainbow_step(int hue);
   void battery_level(int level);
   
@@ -58,32 +103,30 @@ private:
   void set_first(int count, int hue);
 };
 
+LEDDriver led_driver;
+
 // LEDDriver.cpp /////////////////////////////////////////////////////////
 LEDDriver::LEDDriver() {
   FastLED.addLeds<WS2812, LED_DATA_PIN>(leds, NUM_LEDS);
 }
 
-void LEDDriver::single_blink(int ms) {
-  set_first(1, LEDColour::GREEN);
+void LEDDriver::single_blink(int ms, int hue) {
+  set_first(4, hue);
   delay(ms);
   set_first(0, 0);
   delay(ms);
 }
 
-void LEDDriver::double_blink(int ms) {
-  single_blink(ms);
-  single_blink(ms);
+void LEDDriver::double_blink(int ms, int hue) {
+  single_blink(ms, hue);
+  single_blink(ms, hue);
 }
 
 void LEDDriver::next_rainbow_step(int hue) {
   int sector_size = 255 / 4;
   
-  for(int i = 0; i < NUM_LEDS; i++) {   
-    if (i < 1)
-      leds[i] = CHSV(i * sector_size + hue,255,255);
-    else
-      leds[i] = CHSV(0, 0, 0);
-  } 
+  for(int i = 0; i < NUM_LEDS; i++)
+    leds[i] = CHSV(i * sector_size + hue,255,255);
   FastLED.show();
 }
 
@@ -114,8 +157,96 @@ void LEDDriver::set_first(int count, int hue) {
   FastLED.show();
 }
 
-// MelkaState.h ///////////////////////////////////////////////////////////
-enum class MelkaState {
+// PlayersStats.h /////////////////////////////////////////////////////////
+class PlayersStats {
+public:
+  // TODO 
+};
+
+// Game.h /////////////////////////////////////////////////////////////////
+class Game {
+public:
+  Game(int players_cnt);
+
+  virtual bool continue_game() = 0;
+
+protected:
+  int players_cnt;
+  unsigned long last_time;
+
+  DistanceSensor distance_sensor[4];
+};
+
+Game *game_instance = nullptr;
+
+// Game.cpp ///////////////////////////////////////////////////////////////
+Game::Game(int players_cnt)
+  : players_cnt(players_cnt),
+  last_time(millis()),
+  distance_sensor{DistanceSensor(DISTANCE_PIN_1, 1000),
+                  DistanceSensor(DISTANCE_PIN_2, 1000),
+                  DistanceSensor(DISTANCE_PIN_3, 1000),
+                  DistanceSensor(DISTANCE_PIN_4, 1000)}
+{}
+
+// React.h ////////////////////////////////////////////////////////////////
+class React : public Game{
+public:
+  enum class State {
+    GENERATE_COLOUR,
+    WAIT_FOR_REACTION,
+    FINALIZE
+  };
+
+  React(int players_cnt);
+
+  bool continue_game() override;
+  
+private:
+  unsigned long time_stamp;
+  State state;
+  int colour;
+
+  static unsigned long max_waiting_time;
+};
+
+// React.cpp //////////////////////////////////////////////////////////////
+unsigned long React::max_waiting_time = 20000;
+
+React::React(int players_cnt)
+  : Game(players_cnt),
+  time_stamp(0),
+  state(State::GENERATE_COLOUR),
+  colour(0)
+{}
+
+bool React::continue_game() {
+  switch(state) {
+  case State::GENERATE_COLOUR:
+     // get random colour
+    colour = 0;
+    led_driver.single_blink(50, LEDColour::BLUE);
+    time_stamp = millis();
+    state = State::WAIT_FOR_REACTION;
+    break;
+  case State::WAIT_FOR_REACTION: {
+    unsigned long time_diff = millis() - time_stamp;
+    if (distance_sensor[colour].is_activated() || time_diff > max_waiting_time) {
+      // update player points table
+      // check game over condition
+      state = State::FINALIZE;
+    }
+    break;
+  }
+  case State::FINALIZE:
+    // check if next game
+    // go to base state
+    break;
+  }
+}
+
+// SmartCubeState.h ///////////////////////////////////////////////////////////
+enum class SmartCubeState {
   INITIALIZE,
   WAIT_FOR_MASTER,
   MASTER_CONNECTED,
@@ -123,11 +254,11 @@ enum class MelkaState {
   GAME,
   AFTER_GAME
 };
-MelkaState melka_state = MelkaState::INITIALIZE;
+SmartCubeState smart_cube_state = SmartCubeState::INITIALIZE;
 
 // WiFiDriver.h ///////////////////////////////////////////////////////////
 #include <WiFi.h>
-const char *ssid = "Melka";
+const char *ssid = "SmartCube";
 const char *password = "87654321";
 
 WiFiServer server(80);
@@ -144,29 +275,38 @@ namespace APIVariable {
 
 namespace APIFunction {
   int register_master(String) {
-    if (melka_state != MelkaState::WAIT_FOR_MASTER) {
+    if (smart_cube_state != SmartCubeState::WAIT_FOR_MASTER) {
       Serial.println("APIFunction::register_master bad state");
       return 1;
     }
     
-    melka_state = MelkaState::MASTER_CONNECTED;
+    smart_cube_state = SmartCubeState::MASTER_CONNECTED;
     return 0;
   }
 
   int game(String cmd) {
-    if (melka_state != MelkaState::GAME_INITIALIZATION) {
+    if (smart_cube_state != SmartCubeState::GAME_INITIALIZATION) {
       Serial.println("APIFunction::game bad state");
       return 1;
     }
 
-    int player_cnt = cmd[0] - '0';
+    int players_cnt = cmd[0] - '0';
     Serial.print("players = ");
-    Serial.print(player_cnt);
+    Serial.print(players_cnt);
     Serial.print(" game = ");
-    String game = cmd.substring(1, cmd.length());
-    Serial.println(game);
+    String game_name = cmd.substring(1, cmd.length());
+    Serial.println(game_name);
+
+    if (game_instance) {
+      delete game_instance;
+      game_instance = nullptr;
+    }
+      
+    if (game_name == "React") {
+      game_instance = new React(players_cnt);
+    }
     
-    melka_state = MelkaState::GAME;
+    smart_cube_state = SmartCubeState::GAME;
     return 0;    
   }
 }
@@ -196,7 +336,7 @@ void API::configure() {
   rest.function((char*)"game", APIFunction::game);
 
   rest.set_id("123456");
-  rest.set_name((char*)"Melka");
+  rest.set_name((char*)"SmartCube");
 }
 
 void API::handle_request(WiFiServer &server) {
@@ -211,8 +351,6 @@ void API::handle_request(WiFiServer &server) {
 }
 
 // code //////////////////////////////////////////////////////////////////
-DistanceSensor distance_sensor_1(DISTANCE_PIN_1, 1000);
-LEDDriver led_driver;
 API api;
 
 void setup() {
@@ -231,47 +369,49 @@ void loop() {
   api.handle_request(server);
 
   static unsigned long last_time = millis();
-  if (millis() - last_time > 500) {
+  static unsigned long loop_time = 500;
+  if (millis() - last_time > loop_time) {
     last_time = millis();
 
     Serial.println("Slow loop iteration:");
-    switch(melka_state) {
-    case MelkaState::INITIALIZE:
+    switch(smart_cube_state) {
+    case SmartCubeState::INITIALIZE:
       Serial.println("INITIALIZE");
-      melka_state = MelkaState::WAIT_FOR_MASTER;  
+      loop_time = 500;
+      smart_cube_state = SmartCubeState::WAIT_FOR_MASTER;  
       break;
-    case MelkaState::WAIT_FOR_MASTER:
+    case SmartCubeState::WAIT_FOR_MASTER: {
       Serial.println("WAIT_FOR_MASTER");
-      // TODO get real battery level
-      led_driver.battery_level(1);
+      Battery battery(BATTERY_PIN);
+      int level = battery.get_level();
+      led_driver.battery_level(level);
       break;
-    case MelkaState::MASTER_CONNECTED:
+    }
+    case SmartCubeState::MASTER_CONNECTED: {
       Serial.println("MASTER_CONNECTED");
-      led_driver.single_blink(1000);
-      led_driver.double_blink(200);
-      // TODO get real battery level
-      led_driver.battery_level(1);
-      melka_state = MelkaState::GAME_INITIALIZATION;
+      led_driver.single_blink(1000, LEDColour::GREEN);
+      led_driver.double_blink(200, LEDColour::GREEN);
+      Battery battery(BATTERY_PIN);
+      int level = battery.get_level();
+      led_driver.battery_level(level);
+      smart_cube_state = SmartCubeState::GAME_INITIALIZATION;
       break;
-    case MelkaState::GAME_INITIALIZATION:
+    }
+    case SmartCubeState::GAME_INITIALIZATION:
       Serial.println("GAME_INITIALIZATION");
       led_driver.next_rainbow_step(hue);
       hue += 10;
       break;
-    case MelkaState::GAME:
-      Serial.println("GAME");
-      led_driver.next_rainbow_step(hue);
-      hue += 60;
-      break;
-    case MelkaState::AFTER_GAME:
+    case SmartCubeState::GAME: {
+      loop_time = 1;
+      bool stay_in_game = game_instance->continue_game();
+      if (!stay_in_game)
+        smart_cube_state = SmartCubeState::AFTER_GAME;
       break;
     }
-    
-    int value = distance_sensor_1.get_voltage();
-    bool isActive = distance_sensor_1.is_activated();
-    Serial.print("distance_sensor_1: value = ");
-    Serial.print(value);
-    Serial.print(" is_activated = ");
-    Serial.println(isActive);
+    case SmartCubeState::AFTER_GAME:
+      loop_time = 500;
+      break;
+    }
   }
 }
