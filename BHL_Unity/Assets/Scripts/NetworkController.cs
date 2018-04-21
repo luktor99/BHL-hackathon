@@ -5,7 +5,8 @@ using UnityEngine.Networking;
 
 public class NetworkController : MonoBehaviour {
 
-	const string SERVER_URL = "http://localhost:8080";
+
+	const string SERVER_URL = "http://192.168.4.1:8080";
 	const string REGISTRATION_URL = "/register";
 
 

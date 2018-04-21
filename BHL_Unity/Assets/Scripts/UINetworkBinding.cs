@@ -13,20 +13,28 @@ public class UINetworkBinding : MonoBehaviour {
 	public NetworkController networkController;
 	public Image playerColorBackground;
 
-	public Button onePlayerButton;
-	public Button twoPlayersButton;
-	public Button threePlayersButton;
-	public Button fourPlayersButton;
+	public SelectableButton onePlayerButton;
+	public SelectableButton twoPlayersButton;
+	public SelectableButton threePlayersButton;
+	public SelectableButton fourPlayersButton;
 	public Button connectionAndRegistrationButton;
+
+	public SelectableButton pictionaryGameButton;
+	public SelectableButton reflexGameButton;
+
+	private SelectableButton activePlayerNumberButton;
+	private SelectableButton activeGameButton;
 
 
 	// Use this for initialization
 	void Start () {
-        onePlayerButton.onClick.AddListener(delegate { SetNumberOfPlayers(1); });
-		twoPlayersButton.onClick.AddListener(delegate { SetNumberOfPlayers(2); });
-		threePlayersButton.onClick.AddListener(delegate { SetNumberOfPlayers(3); });
-		fourPlayersButton.onClick.AddListener(delegate { SetNumberOfPlayers(4); });
+        onePlayerButton.onClick.AddListener(delegate { SetNumberOfPlayers(1, onePlayerButton); });
+		twoPlayersButton.onClick.AddListener(delegate { SetNumberOfPlayers(2, twoPlayersButton); });
+		threePlayersButton.onClick.AddListener(delegate { SetNumberOfPlayers(3, threePlayersButton); });
+		fourPlayersButton.onClick.AddListener(delegate { SetNumberOfPlayers(4, fourPlayersButton); });
 		connectionAndRegistrationButton.onClick.AddListener (delegate { CheckConnectionAndRegisterPlayer (); });
+		pictionaryGameButton.onClick.AddListener (delegate { SetActiveGame (Game.PICTIONARY, pictionaryGameButton); });
+		reflexGameButton.onClick.AddListener(delegate { SetActiveGame (Game.REFLEX, reflexGameButton); });
     }
 		
     void CheckConnectionAndRegisterPlayer()
@@ -36,9 +44,23 @@ public class UINetworkBinding : MonoBehaviour {
 		playerColorBackground.color = newColor;
     }
 
-    void SetNumberOfPlayers(int numberOfPlayers)
+	void SetNumberOfPlayers(int numberOfPlayers, SelectableButton button)
     {
         Debug.Log("SetNumberOfPlayers: " + numberOfPlayers);
+		if (activePlayerNumberButton != null) {
+			activePlayerNumberButton.buttonSelected (false);
+		}
+		activePlayerNumberButton = button;
+		activePlayerNumberButton.buttonSelected (true);
     }
+
+	void SetActiveGame(Game game, SelectableButton button){
+		Debug.Log ("Selected game: " + game);
+		if (activeGameButton != null) {
+			activeGameButton.buttonSelected (false);
+		}
+		activeGameButton = button;
+		activeGameButton.buttonSelected (true);
+	}
     
 }
