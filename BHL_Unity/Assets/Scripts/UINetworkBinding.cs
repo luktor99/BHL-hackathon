@@ -9,6 +9,11 @@ using UnityEngine.UI;
 
 public class UINetworkBinding : MonoBehaviour {
 
+
+	const string START_PICTIONARY_TRIGGER = "StartPictionary";
+	const string START_REFLEX_TRIGGER = "StartReflex";
+	const string END_GAME_TRIGGER = "EndGame";
+
 	public Image playerColorBackground;
 
 	public SelectableButton onePlayerButton;
@@ -17,6 +22,7 @@ public class UINetworkBinding : MonoBehaviour {
 	public SelectableButton fourPlayersButton;
 	public Button connectionAndRegistrationButton;
 	public Button playButton;
+	public Button resetButton;
 
 	public SelectableButton pictionaryGameButton;
 	public SelectableButton reflexGameButton;
@@ -24,6 +30,7 @@ public class UINetworkBinding : MonoBehaviour {
 	private SelectableButton activePlayerNumberButton;
 	private SelectableButton activeGameButton;
 
+	public Animator uiAnimator;
 
 	// Use this for initialization
 	void Start () {
@@ -35,6 +42,7 @@ public class UINetworkBinding : MonoBehaviour {
 		pictionaryGameButton.onClick.AddListener (delegate { SetActiveGame (Game.PICTIONARY, pictionaryGameButton); });
 		reflexGameButton.onClick.AddListener(delegate { SetActiveGame (Game.REFLEX, reflexGameButton); });
 		playButton.onClick.AddListener (delegate { play (); });
+		resetButton.onClick.AddListener (delegate { reset (); });
     }
 		
     void CheckConnectionAndRegisterPlayer()
@@ -67,6 +75,25 @@ public class UINetworkBinding : MonoBehaviour {
 
 	void play(){
 		NetworkController.Instance.DoPlayConfiguration ();
+		// TODO WAIT FOR SERVER RESPONSE
+		playSuccess();
+	}
+
+	void reset(){
+		// TODO SEND RESET TO SERVER AND WAIT FOR RESPONSE
+		resetSuccess();
 	}
     
+	void resetSuccess(){
+		uiAnimator.SetTrigger (END_GAME_TRIGGER);
+	}
+
+	void playSuccess(){
+		if (GameStateController.Instance.getCurrentGame () == Game.PICTIONARY) {
+			uiAnimator.SetTrigger (START_PICTIONARY_TRIGGER);
+		} else if (GameStateController.Instance.getCurrentGame () == Game.REFLEX) {
+			uiAnimator.SetTrigger (START_REFLEX_TRIGGER);
+		}
+	}
+
 }
