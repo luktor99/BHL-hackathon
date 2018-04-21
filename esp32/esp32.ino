@@ -55,9 +55,9 @@ void LEDDriver::nextWaveStep(int hue) {
   
   for(int i = 0; i < NUM_LEDS; i++) {   
     // fade everything out
-    leds.fadeToBlackBy(40);
+//    leds.fadeToBlackBy(40);
 
-    if (i < 1)
+    if (i < 4)
       leds[i] = CHSV(i * sector_size + hue,255,255);
     else
       leds[i] = CHSV(0, 0, 0);
@@ -65,12 +65,28 @@ void LEDDriver::nextWaveStep(int hue) {
   FastLED.show();
 }
 
+// WiFi driver ///////////////////////////////////////////////////////////
+#include <WiFi.h>
+const char *ssid = "Melka";
+const char *password = "87654321";
+
 // code //////////////////////////////////////////////////////////////////
 DistanceSensor distance_sensor_1(DISTANCE_PIN_1, 1000);
 LEDDriver led_driver;
 
+ 
+WiFiServer server(80);
+
 void setup() {
   Serial.begin(115200);  
+
+  WiFi.softAP(ssid, password);
+ 
+  Serial.println();
+  Serial.print("IP address: ");
+  Serial.println(WiFi.softAPIP());
+ 
+  server.begin();
 }
 
 enum class MelkaState {
@@ -112,7 +128,5 @@ void loop() {
   Serial.print(" is_activated = ");
   Serial.println(isActive);
 
-  
-  
   delay(1000);
 }
