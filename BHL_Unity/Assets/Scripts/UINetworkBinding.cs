@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TheNextFlow.UnityPlugins;
 
 
 
@@ -47,10 +48,13 @@ public class UINetworkBinding : MonoBehaviour {
 		
     void CheckConnectionAndRegisterPlayer()
     {
-		Color newColor = NetworkController.Instance.DoConnectAndRegisterPlayer ();
+		NetworkController.Instance.DoConnectAndRegisterPlayer ();
+    }
+
+	public void ConnectionSuccess(Color newColor){
 		GameStateController.Instance.setPlayerColor (newColor);
 		playerColorBackground.color = newColor;
-    }
+	}
 
 	void SetNumberOfPlayers(int numberOfPlayers, SelectableButton button)
     {
@@ -76,7 +80,6 @@ public class UINetworkBinding : MonoBehaviour {
 	void play(){
 		NetworkController.Instance.DoPlayConfiguration ();
 		// TODO WAIT FOR SERVER RESPONSE
-		playSuccess();
 	}
 
 	void reset(){
@@ -84,15 +87,32 @@ public class UINetworkBinding : MonoBehaviour {
 		resetSuccess();
 	}
     
-	void resetSuccess(){
+	public void resetSuccess(){
 		uiAnimator.SetTrigger (END_GAME_TRIGGER);
 	}
 
-	void playSuccess(){
+	public void playSuccess(){
 		if (GameStateController.Instance.getCurrentGame () == Game.PICTIONARY) {
 			uiAnimator.SetTrigger (START_PICTIONARY_TRIGGER);
 		} else if (GameStateController.Instance.getCurrentGame () == Game.REFLEX) {
 			uiAnimator.SetTrigger (START_REFLEX_TRIGGER);
+		}
+	}
+
+	public void toastServerError( long errorCode ){
+		AndroidNativePopups.OpenToast("Connection error, code: " + errorCode, AndroidNativePopups.ToastDuration.Long);
+	}
+
+
+	private static UINetworkBinding _instance;
+
+	public static UINetworkBinding Instance { get { return _instance; } }
+
+	private void Awake(){
+		if (_instance != null && _instance != this) {
+			Destroy (this.gameObject);
+		} else {
+			_instance = this;
 		}
 	}
 
