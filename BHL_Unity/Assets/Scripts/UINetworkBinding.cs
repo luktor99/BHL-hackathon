@@ -9,8 +9,6 @@ using UnityEngine.UI;
 
 public class UINetworkBinding : MonoBehaviour {
 
-
-	public NetworkController networkController;
 	public Image playerColorBackground;
 
 	public SelectableButton onePlayerButton;
@@ -18,6 +16,7 @@ public class UINetworkBinding : MonoBehaviour {
 	public SelectableButton threePlayersButton;
 	public SelectableButton fourPlayersButton;
 	public Button connectionAndRegistrationButton;
+	public Button playButton;
 
 	public SelectableButton pictionaryGameButton;
 	public SelectableButton reflexGameButton;
@@ -35,11 +34,12 @@ public class UINetworkBinding : MonoBehaviour {
 		connectionAndRegistrationButton.onClick.AddListener (delegate { CheckConnectionAndRegisterPlayer (); });
 		pictionaryGameButton.onClick.AddListener (delegate { SetActiveGame (Game.PICTIONARY, pictionaryGameButton); });
 		reflexGameButton.onClick.AddListener(delegate { SetActiveGame (Game.REFLEX, reflexGameButton); });
+		playButton.onClick.AddListener (delegate { play (); });
     }
 		
     void CheckConnectionAndRegisterPlayer()
     {
-		Color newColor = networkController.DoConnectAndRegisterPlayer ();
+		Color newColor = NetworkController.Instance.DoConnectAndRegisterPlayer ();
 		GameStateController.Instance.setPlayerColor (newColor);
 		playerColorBackground.color = newColor;
     }
@@ -47,6 +47,7 @@ public class UINetworkBinding : MonoBehaviour {
 	void SetNumberOfPlayers(int numberOfPlayers, SelectableButton button)
     {
         Debug.Log("SetNumberOfPlayers: " + numberOfPlayers);
+		GameStateController.Instance.setNumberOfPlayers (numberOfPlayers);
 		if (activePlayerNumberButton != null) {
 			activePlayerNumberButton.buttonSelected (false);
 		}
@@ -56,11 +57,16 @@ public class UINetworkBinding : MonoBehaviour {
 
 	void SetActiveGame(Game game, SelectableButton button){
 		Debug.Log ("Selected game: " + game);
+		GameStateController.Instance.setCurrentGame (game);
 		if (activeGameButton != null) {
 			activeGameButton.buttonSelected (false);
 		}
 		activeGameButton = button;
 		activeGameButton.buttonSelected (true);
+	}
+
+	void play(){
+		NetworkController.Instance.DoPlayConfiguration ();
 	}
     
 }

@@ -7,12 +7,22 @@ public enum Game
 	REFLEX,
 	PICTIONARY
 };
-	
+
+public enum AppState
+{
+	CONFIGURATION,
+	REFLEX,
+	PICTIONARY
+};
+
+
 public class GameStateController : MonoBehaviour {
 
 
 	private Color playerColor = Color.red;
 	private Game currentGame = Game.REFLEX;
+	private AppState currentAppState = AppState.CONFIGURATION;
+	private int numberOfPlayers = 1;
 
 	public void setCurrentGame(Game newGame){
 		currentGame = newGame;
@@ -30,6 +40,22 @@ public class GameStateController : MonoBehaviour {
 		return playerColor;
 	}
 
+	public void setNumberOfPlayers(int number){
+		numberOfPlayers = number;
+	}
+
+	public int getNumberOfPlayers(){
+		return numberOfPlayers;
+	}
+
+	public void setCurrentAppState( AppState state) {
+		currentAppState	= state;
+	}
+
+	public AppState getCurrentAppState(){
+		return currentAppState;
+	}
+		
 
 	private static GameStateController _instance;
 
