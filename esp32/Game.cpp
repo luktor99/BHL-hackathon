@@ -16,7 +16,7 @@ Game::Game(int players_cnt)
 
 LEDColour Game::getRandomColour() {
     static std::default_random_engine generator(analogRead(26));
-    static std::uniform_int_distribution<int> distribution(0,4);
+    static std::uniform_int_distribution<int> distribution(0,players_cnt);
     
     switch(distribution(generator)){
       case 0:

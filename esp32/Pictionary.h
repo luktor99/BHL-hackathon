@@ -8,6 +8,7 @@ public:
   enum class State {
     GENERATE_COLOUR,
     WAIT_FOR_REACTION,
+    WAIT_FOR_ANSWER,
     FINALIZE
   };
 

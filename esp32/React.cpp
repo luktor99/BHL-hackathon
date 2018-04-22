@@ -12,40 +12,15 @@ React::React(int players_cnt)
           colour(LEDColour::RED)
 {}
 
-namespace {
- LEDColour IntToLEDColour(int colour){
- switch(colour){
-      case 0:
-        return LEDColour::RED;
-      case 1:
-        return LEDColour::YELLOW;
-      case 2:
-        return LEDColour::GREEN;
-      case 3:
-        return LEDColour::BLUE;
-    }
-}
- int LEDColourToInt(LEDColour colour){
- switch(colour){
-      case LEDColour::RED:
-        return 0;
-      case LEDColour::YELLOW:
-        return 1;
-      case LEDColour::GREEN:
-        return 2;
-      case LEDColour::BLUE:
-        return 3;
-    }
-}
-
-}
-
 bool React::continue_game() {
     int winner = 4;
     switch(state) {
         case State::GAME_START:
-            for(int i = 0; i < 4; ++i){
+            led_driver.set_first(0, 0);
+            delay(100);
+            for(int i = 0; i < players_cnt; ++i){
                player_times[i] = max_waiting_time;
+               led_driver.double_blink(500, IntToLEDColour(i));
             }
         case State::GENERATE_COLOUR:
             colour = getRandomColour();
@@ -62,7 +37,7 @@ bool React::continue_game() {
               player_times[LEDColourToInt(colour)] -= waiting_time;
               state = State::UPDATE_SCORES;
             }
-            for(int i=0; i < 4; ++i){
+            for(int i=0; i < players_cnt; ++i){
               if(!distance_sensor[i].is_activated())
                 continue;
                 
@@ -79,7 +54,7 @@ bool React::continue_game() {
         }
         case State::UPDATE_SCORES: {
             int players_done = 0; 
-            for(int i = 0; i < 4; ++i){
+            for(int i = 0; i < players_cnt; ++i){
               Serial.println(player_times[i]);
               if(player_times[i] <= 0){
                 player_times[i] = 0;
@@ -89,11 +64,11 @@ bool React::continue_game() {
                 winner = i;
               }
             }
-            if(players_done == 3){
+            if(players_done == players_cnt-1){
               PlayersStats::setPlayerValue(winner,1);
               state = State::FINALIZE;
             }
-            else if(players_done == 4){
+            else if(players_done == players_cnt){
               state = State::FINALIZE;
             }
             else{
@@ -102,6 +77,9 @@ bool React::continue_game() {
             break;
         }
         case State::FINALIZE:
+            led_driver.set_first(0, 0);
+            delay(100);
+            led_driver.double_blink(500, IntToLEDColour(winner));
             return false;
     }
     return true;
