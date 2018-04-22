@@ -2,7 +2,6 @@
 #define ESP32_REACT_H
 
 #include "Game.h"
-#include "PlayersStats.h"
 
 class React : public Game {
 public:
@@ -21,7 +20,7 @@ public:
 private:
   unsigned long time_stamp;
   State state;
-  int colour;
+  LEDColour colour;
 
   int player_times[4];
 

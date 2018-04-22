@@ -174,7 +174,6 @@ void loop() {
     Battery battery(BATTERY_PIN);
     battery_level = battery.get_level();
     
-    Serial.println("Slow loop iteration:");
     switch(smart_cube_state) {
     case SmartCubeState::INITIALIZE:
       Serial.println("INITIALIZE");

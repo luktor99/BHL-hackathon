@@ -1,7 +1,7 @@
 #include "Game.h"
 
-#include <chrono>
 #include <Arduino.h>
+
 
 Game *game_instance = nullptr;
 
@@ -14,13 +14,20 @@ Game::Game(int players_cnt)
                   DistanceSensor(DISTANCE_PIN_4, 1000)}
 {}
 
-PlayerColours Game::getRandomColour()
-{
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine generator(seed);
-    std::uniform_int_distribution<int> distribution(0,3);
+LEDColour Game::getRandomColour() {
+    static std::default_random_engine generator(analogRead(26));
+    static std::uniform_int_distribution<int> distribution(0,4);
     
-    return static_cast<PlayerColours>(distribution(generator));  
+    switch(distribution(generator)){
+      case 0:
+        return LEDColour::RED;
+      case 1:
+        return LEDColour::YELLOW;
+      case 2:
+        return LEDColour::GREEN;
+      case 3:
+        return LEDColour::BLUE;
+    }
 }
 
 

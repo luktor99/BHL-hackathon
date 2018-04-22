@@ -6,21 +6,16 @@
 class Pictionary : public Game {
 public:
   enum class State {
-    UPDATE_SCORES,
+    GENERATE_COLOUR,
     WAIT_FOR_REACTION,
     FINALIZE
   };
 
   Pictionary(int players_cnt);
-
   bool continue_game() override;
-  PlayerColours getActivatedSensor();
-  void getActivatedSensor(PlayerColours col);
   
 private:
- 
   State state;
-  PlayerColours colour;
 };
 
 #endif
