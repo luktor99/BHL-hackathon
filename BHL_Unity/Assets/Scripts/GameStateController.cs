@@ -5,7 +5,8 @@ using UnityEngine;
 public enum Game
 {
 	REFLEX,
-	PICTIONARY
+	PICTIONARY,
+	NONE
 };
 
 public enum AppState
@@ -28,7 +29,7 @@ public class GameStateController : MonoBehaviour {
 
 
 	private Color playerColor = Color.red;
-	private Game currentGame = Game.REFLEX;
+	private Game currentGame = Game.NONE;
 	private AppState currentAppState = AppState.CONFIGURATION;
 	private int numberOfPlayers = 1;
 

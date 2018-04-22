@@ -7468,12 +7468,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a93dcde7682eda42ae4a351d6bd2f0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  batteryFull: {fileID: 0}
-  batteryNearlyFull: {fileID: 0}
-  batteryHalf: {fileID: 0}
-  batteryNearlyEmpty: {fileID: 0}
-  batteryEmpty: {fileID: 0}
-  batteryImage: {fileID: 0}
+  batteryFull: {fileID: 21300000, guid: 2a292c7653cd82543b4ccd3c961cd36d, type: 3}
+  batteryNearlyFull: {fileID: 21300000, guid: aa58a7fc5ed8f984ba73151e1f7230da, type: 3}
+  batteryHalf: {fileID: 21300000, guid: 806800676ae1a2841adad0afa6e5dfeb, type: 3}
+  batteryNearlyEmpty: {fileID: 21300000, guid: a51afe362edca774eb95102b362439c5, type: 3}
+  batteryEmpty: {fileID: 21300000, guid: 3a49d36d3d7679f41882dcdf5798faa1, type: 3}
+  batteryImage: {fileID: 831932294}
 --- !u!1 &832646757
 GameObject:
   m_ObjectHideFlags: 0
@@ -9924,6 +9924,15 @@ MonoBehaviour:
   pictionaryGameButton: {fileID: 1355430818}
   reflexGameButton: {fileID: 1537243313}
   uiAnimator: {fileID: 1640224010}
+  pictionaryRedScore: {fileID: 1330293249}
+  pictionaryBlueScore: {fileID: 1310963300}
+  pictionaryYellowScore: {fileID: 1657872170}
+  pictionaryGreenScore: {fileID: 555497191}
+  reflexRedScore: {fileID: 1131094730}
+  reflexBlueScore: {fileID: 2039183120}
+  reflexYellowScore: {fileID: 841227059}
+  reflexGreenScore: {fileID: 68741703}
+  batteryStatusController: {fileID: 831932296}
 --- !u!114 &1118710700
 MonoBehaviour:
   m_ObjectHideFlags: 0

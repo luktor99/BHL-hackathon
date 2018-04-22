@@ -14,9 +14,7 @@ public class BatteryStatusUIController : MonoBehaviour {
 	public Image batteryImage;
 
 	public void setBatteryLevel(int level){
-		if (level == 0) {
-			batteryImage.sprite = batteryEmpty;
-		} else if (level == 1) {
+		 if (level == 1) {
 			batteryImage.sprite = batteryNearlyEmpty;
 		} else if (level == 2) {
 			batteryImage.sprite = batteryHalf;

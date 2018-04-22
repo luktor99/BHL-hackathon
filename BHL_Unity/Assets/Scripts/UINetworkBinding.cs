@@ -33,6 +33,21 @@ public class UINetworkBinding : MonoBehaviour {
 
 	public Animator uiAnimator;
 
+	public Text pictionaryRedScore;
+	public Text pictionaryBlueScore;
+	public Text pictionaryYellowScore;
+	public Text pictionaryGreenScore;
+
+	public Text reflexRedScore;
+	public Text reflexBlueScore;
+	public Text reflexYellowScore;
+	public Text reflexGreenScore;
+
+	public BatteryStatusUIController batteryStatusController;
+
+
+
+
 	// Use this for initialization
 	void Start () {
         onePlayerButton.onClick.AddListener(delegate { SetNumberOfPlayers(1, onePlayerButton); });
@@ -98,6 +113,62 @@ public class UINetworkBinding : MonoBehaviour {
 			uiAnimator.SetTrigger (START_REFLEX_TRIGGER);
 		}
 	}
+
+	public void translateBatteryLevel(string jsonString){
+		BatteryInfo info = JsonUtility.FromJson<BatteryInfo> (jsonString);
+		batteryStatusController.setBatteryLevel (info.battery);
+	}
+
+	public void translatePictionaryInfo (string jsonString){
+		PictionaryInfo info = JsonUtility.FromJson<PictionaryInfo> (jsonString);
+		if (info == null) {
+			return;
+		}
+
+		if (info.now_showing == "red") {
+			playerColorBackground.color = Color.red;
+		} else if (info.now_showing == "blue") {
+			playerColorBackground.color = Color.blue;
+		} else if (info.now_showing == "green") {
+			playerColorBackground.color = Color.green;
+		} else if (info.now_showing == "yellow") {
+			playerColorBackground.color = Color.yellow;
+		}
+
+		if (info.now_answering == "red") {
+			showPictionaryDialog (Player.RED);
+		} else if (info.now_answering == "blue") {
+			showPictionaryDialog (Player.BLUE);
+		} else if (info.now_answering == "green") {
+			showPictionaryDialog (Player.GREEN);
+		} else if (info.now_answering == "yellow") {
+			showPictionaryDialog (Player.YELLLOW);
+		}
+
+		pictionaryRedScore.text = info.red;
+		pictionaryBlueScore.text = info.blue;
+		pictionaryYellowScore.text = info.yellow;
+		pictionaryGreenScore.text = info.green;
+
+		batteryStatusController.setBatteryLevel (info.battery);
+
+	}
+
+	public void translateReflexInfo (string jsonString){
+		ReflexInfo info = JsonUtility.FromJson<ReflexInfo> (jsonString);
+		if (info == null) {
+			return;
+		}
+
+		reflexRedScore.text = info.red;
+		reflexBlueScore.text = info.blue;
+		reflexYellowScore.text = info.yellow;
+		reflexGreenScore.text = info.green;
+
+		batteryStatusController.setBatteryLevel (info.battery);
+
+	}
+
 
 	public void showPictionaryDialog(Player player){
 		if (Application.platform == RuntimePlatform.Android) {

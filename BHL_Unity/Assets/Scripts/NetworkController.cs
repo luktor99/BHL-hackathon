@@ -6,14 +6,15 @@ using System.Timers;
 
 public class NetworkController : MonoBehaviour {
 
-	const bool production = false;
+	const bool production = true;
 
 	const string SERVER_URL = "http://192.168.4.1";
 	const string MOCK_URL = "https://c74d8ef8-bac3-40a0-a41e-1c6e1bf1a51a.mock.pstmn.io";
 	const string REGISTRATION_URL = "/register";
 	const string GAME_URL = "/game?params=";
-	const string REFLEX_INFO_URL = "/reflex";
-	const string PICTIONARY_INFO_URL = "/kalam";
+	const string REFLEX_INFO_URL = "/react";
+	const string PICTIONARY_INFO_URL = "/pictionary";
+	const string RESET_URL = "/reset";
 
 
 
@@ -36,6 +37,30 @@ public class NetworkController : MonoBehaviour {
 		StartCoroutine (PlayConfiguration ());
 	}
 
+	public void DoReset(){
+		StartCoroutine (ResetGame ());
+	}
+
+	IEnumerator ResetGame(){
+		UnityWebRequest www;
+		if (production) {
+			www = UnityWebRequest.Get (SERVER_URL + RESET_URL);
+		} else {
+			www = UnityWebRequest.Get (MOCK_URL + RESET_URL);
+		}
+		yield return www.SendWebRequest ();
+
+		if(www.isNetworkError || www.isHttpError) {
+			Debug.Log(www.error);
+			UINetworkBinding.Instance.toastServerError (www.responseCode);
+		}
+		else {
+			Debug.Log("Request response code: " + www.responseCode);
+			Debug.Log("Request succesfull: " + www.downloadHandler.text);
+			UINetworkBinding.Instance.resetSuccess ();
+		}
+	}
+
 	IEnumerator ReflexInfoPoll(){
 		while (true) {
 			if (GameStateController.Instance.getCurrentGame () == Game.REFLEX) {
@@ -55,17 +80,16 @@ public class NetworkController : MonoBehaviour {
 
 				if (wwwPoll.isNetworkError || wwwPoll.isHttpError) {
 					Debug.Log (wwwPoll.error);
-					if (Application.platform == RuntimePlatform.Android) {
-						UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
-					}
+					UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
+
 				} else {
 					Debug.Log ("Request response code: " + wwwPoll.responseCode);
 					Debug.Log ("Request succesfull: " + wwwPoll.downloadHandler.text);
-					// TODO INTERPRET REFLEX INFO
+					UINetworkBinding.Instance.translateReflexInfo (wwwPoll.downloadHandler.text);
 				}	
 			}
 			yield return new WaitForSeconds (0.2f);
-			Debug.Log ("After timer");
+			//Debug.Log ("After timer");
 		}
 
 	}
@@ -95,7 +119,7 @@ public class NetworkController : MonoBehaviour {
 				} else {
 					Debug.Log ("Request response code: " + wwwPoll.responseCode);
 					Debug.Log ("Request succesfull: " + wwwPoll.downloadHandler.text);
-					// TODO INTERPRET PICT INFO
+					UINetworkBinding.Instance.translatePictionaryInfo (wwwPoll.downloadHandler.text);
 				}
 			}
 			yield return new WaitForSeconds (0.2f);
@@ -159,8 +183,8 @@ public class NetworkController : MonoBehaviour {
 			Debug.Log("Request response code: " + www.responseCode);
 			Debug.Log("Request succesfull: " + www.downloadHandler.text);
 			UINetworkBinding.Instance.ConnectionSuccess (Color.red);
-		}
 
+		}
 		//TODO Get battery level from response
 	}
 
