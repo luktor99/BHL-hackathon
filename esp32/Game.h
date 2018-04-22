@@ -2,6 +2,8 @@
 #define ESP32_GAME_H
 
 #include "DistanceSensor.h"
+#include <random>
+#include "LEDDriver.h"
 
 class Game {
 public:
@@ -12,6 +14,8 @@ public:
 protected:
   int players_cnt;
   unsigned long last_time;
+
+  LEDColour getRandomColour();
 
   DistanceSensor distance_sensor[4];
 };
