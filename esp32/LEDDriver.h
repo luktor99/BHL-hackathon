@@ -9,9 +9,9 @@
 
 enum LEDColour {
   RED = 0,
-  YELLOW = 1,
-  GREEN = 2,
-  BLUE = 3,
+  YELLOW = 42,
+  GREEN = 85,
+  BLUE = 171
 };
 
 class LEDDriver {

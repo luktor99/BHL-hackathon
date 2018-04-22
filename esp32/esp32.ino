@@ -20,6 +20,9 @@ namespace APIFunction {
   }
 
   void game(int players_cnt, String game_name) {
+    Serial.println("BEIGIN");
+    Serial.println(players_cnt);
+    Serial.println(game_name);
     if (smart_cube_state != SmartCubeState::GAME_INITIALIZATION) {
       Serial.println("APIFunction::game bad state");
       return;
@@ -35,6 +38,13 @@ namespace APIFunction {
     }
     
     smart_cube_state = SmartCubeState::GAME;  
+
+    Serial.println("END");
+  }
+
+  void reset() {
+    smart_cube_state = SmartCubeState::INITIALIZE;
+    PlayersStats::clearStats();
   }
 }
 
@@ -104,6 +114,19 @@ void API::configure() {
 
   server.on("/register", HTTP_GET, [&](AsyncWebServerRequest *request) {
     APIFunction::register_master();
+    
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = battery_level;
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
+
+  server.on("/reset", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    APIFunction::reset();
     
     jsonBuffer.clear();
     JsonObject& json = jsonBuffer.createObject();
