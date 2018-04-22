@@ -35,5 +35,6 @@ bool React::continue_game() {
     // go to base state
     break;
   }
+  return true;
 }
 

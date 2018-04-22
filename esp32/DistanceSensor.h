@@ -12,11 +12,12 @@ class DistanceSensor {
 public:
   DistanceSensor(int pin, int activation_threashold);
   
-  bool is_activated() const;
+  bool is_activated();
   
 private:
   ADCDriver adc_driver;
   const int activation_threashold;
+  int last_voltage;
 };
 
 #endif
