@@ -139,6 +139,33 @@ void API::configure() {
     json.printTo(jsonString);
     request->send(200, "application/json", jsonString);
   });
+
+  server.on("/answer", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    AsyncWebParameter* answer = request->getParam(0);
+
+    if(answer->value() == "true") {
+      //...
+    }
+    else {
+      //...
+    }
+    
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = battery_level;
+    json["time_stamp"] = PlayersStats::getTimeStamp();
+    json["now_showing"] = PlayersStats::getNowShowing();
+    json["now_answering"] = PlayersStats::getNowAnswering();
+    json["red"] = PlayersStats::getPlayerValue(0);
+    json["blue"] = PlayersStats::getPlayerValue(1);
+    json["green"] = PlayersStats::getPlayerValue(2);
+    json["yellow"] = PlayersStats::getPlayerValue(3);
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
 }
 
 void API::handle_request(WiFiServer &server) {
