@@ -10,38 +10,20 @@
 #include <ArduinoJson.h>
 
 // API.h /////////////////////////////////////////////////////////////////
-// libraries => https://github.com/marcoschwartz/aREST
-#include <aREST.h>
-
-namespace APIVariable {
-  bool state = true;
-  int temperature = 25;
-  String nick = "hot20";
-}
-
 namespace APIFunction {
-  int register_master(String) {
+  void register_master() {
     if (smart_cube_state != SmartCubeState::WAIT_FOR_MASTER) {
       Serial.println("APIFunction::register_master bad state");
-      return 1;
+      return;
     }
-    
     smart_cube_state = SmartCubeState::MASTER_CONNECTED;
-    return 0;
   }
 
-  int game(String cmd) {
+  void game(int players_cnt, String game_name) {
     if (smart_cube_state != SmartCubeState::GAME_INITIALIZATION) {
       Serial.println("APIFunction::game bad state");
-      return 1;
+      return;
     }
-
-    int players_cnt = cmd[0] - '0';
-    Serial.print("players = ");
-    Serial.print(players_cnt);
-    Serial.print(" game = ");
-    String game_name = cmd.substring(1, cmd.length());
-    Serial.println(game_name);
 
     if (game_instance) {
       delete game_instance;
@@ -52,8 +34,7 @@ namespace APIFunction {
       game_instance = new React(players_cnt);
     }
     
-    smart_cube_state = SmartCubeState::GAME;
-    return 0;    
+    smart_cube_state = SmartCubeState::GAME;  
   }
 }
 
@@ -73,17 +54,61 @@ API::API() {
 }
 
 void API::configure() {
+  server.on("/game", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    AsyncWebParameter* players_count = request->getParam(0);
+    AsyncWebParameter* game = request->getParam(1);
+
+    APIFunction::game(players_count->value().toInt(), game->value());
+    
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = battery_level;
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
+
   server.on("/pictionary", HTTP_GET, [&](AsyncWebServerRequest *request) {
     jsonBuffer.clear();
     JsonObject& json = jsonBuffer.createObject();
     
-    json["battery"] = 2;
+    json["battery"] = battery_level;
     json["now_showing"] = "red";
     json["now_answering"] = "none";
-    json["red"] = 2;
-    json["blue"] = 1;
-    json["green"] = 5;
-    json["yellow"] = 8;
+    json["red"] = PlayersStats::getPlayerValue(0);
+    json["blue"] = PlayersStats::getPlayerValue(1);
+    json["green"] = PlayersStats::getPlayerValue(2);
+    json["yellow"] = PlayersStats::getPlayerValue(3);
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
+
+  server.on("/react", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = battery_level;
+    json["red"] = PlayersStats::getPlayerValue(0);
+    json["blue"] = PlayersStats::getPlayerValue(1);
+    json["green"] = PlayersStats::getPlayerValue(2);
+    json["yellow"] = PlayersStats::getPlayerValue(3);
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
+
+  server.on("/register", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    APIFunction::register_master();
+    
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = battery_level;
     
     String jsonString;
     json.printTo(jsonString);
