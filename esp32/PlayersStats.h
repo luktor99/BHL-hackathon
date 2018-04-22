@@ -2,9 +2,16 @@
 #define ESP32_PLAYERS_STATS_H
 
 class PlayersStats {
+  
 public:
-  // TODO 
-};
+   PlayersStats();
+   ~PlayersStats();
 
+  void setPlayerValue(int user, int value);
+  int getPlayerValue(int user);
+     
+private:
+    int ranking[NUM_LEDS];
+};
 #endif
 
