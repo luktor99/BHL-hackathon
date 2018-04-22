@@ -2,6 +2,7 @@
 #define ESP32_REACT_H
 
 #include "Game.h"
+#include "PlayersStats.h"
 
 class React : public Game {
 public:

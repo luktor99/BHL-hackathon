@@ -1,5 +1,6 @@
 #include "Game.h"
 
+#include <chrono>
 #include <Arduino.h>
 
 Game *game_instance = nullptr;
@@ -15,7 +16,8 @@ Game::Game(int players_cnt)
 
 LEDColour Game::getRandomColour()
 {
-    std::default_random_engine generator;
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
     std::uniform_int_distribution<int> distribution(0,3);
     
     return static_cast<LEDColour>(distribution(generator));  

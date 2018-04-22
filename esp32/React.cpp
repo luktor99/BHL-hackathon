@@ -12,6 +12,7 @@ React::React(int players_cnt)
 {}
 
 bool React::continue_game() {
+    unsigned int winner = 4;
     switch(state) {
         case State::GAME_START:
             for(int i = 0; i < 4; ++i){
@@ -45,21 +46,30 @@ bool React::continue_game() {
         }
         case State::UPDATE_SCORES:
         {
-            int players_done = 0; 
+            int players_done = 0;
             for(int i = 0; i < 4; ++i){
               if(player_times[i] <= 0){
                 player_times[i] = 0;
                 ++players_done;
               }
-              if(players_done > 2){
-                state = State::FINALIZE;
+              else{
+                winner = i;
               }
-              break;
             }
+            if(players_done == 3){
+              state = State::FINALIZE;
+            }
+            else if(players_done == 4){
+              winner = 4; 
+              state = State::FINALIZE;
+            }
+            break;
         }
         case State::FINALIZE:
-            
+            if(winner < 4){
+              PlayersStats::setPlayerValue(winner, 1);
+            }
             return false;
     }
-    return false;
+    return true;
 }
