@@ -14,23 +14,16 @@ namespace APIFunction {
   void register_master() {
     if (smart_cube_state != SmartCubeState::WAIT_FOR_MASTER) {
       Serial.println("APIFunction::register_master bad state");
-      return
+      return;
     }
     smart_cube_state = SmartCubeState::MASTER_CONNECTED;
   }
 
-  int game(String cmd) {
+  void game(int players_cnt, String game_name) {
     if (smart_cube_state != SmartCubeState::GAME_INITIALIZATION) {
       Serial.println("APIFunction::game bad state");
-      return 1;
+      return;
     }
-
-    int players_cnt = cmd[0] - '0';
-    Serial.print("players = ");
-    Serial.print(players_cnt);
-    Serial.print(" game = ");
-    String game_name = cmd.substring(1, cmd.length());
-    Serial.println(game_name);
 
     if (game_instance) {
       delete game_instance;
@@ -41,8 +34,7 @@ namespace APIFunction {
       game_instance = new React(players_cnt);
     }
     
-    smart_cube_state = SmartCubeState::GAME;
-    return 0;    
+    smart_cube_state = SmartCubeState::GAME;  
   }
 }
 
@@ -66,18 +58,18 @@ void API::configure() {
     AsyncWebParameter* players_count = request->getParam(0);
     AsyncWebParameter* game = request->getParam(1);
 
-    // Do sth with players_count->value().toInt() and game->value()
+    APIFunction::game(players_count->value().toInt(), game->value());
     
     jsonBuffer.clear();
     JsonObject& json = jsonBuffer.createObject();
     
-    json["battery"] = 2;
+    json["battery"] = battery_level;
     
     String jsonString;
     json.printTo(jsonString);
     request->send(200, "application/json", jsonString);
   });
-  
+
   server.on("/pictionary", HTTP_GET, [&](AsyncWebServerRequest *request) {
     jsonBuffer.clear();
     JsonObject& json = jsonBuffer.createObject();
@@ -111,7 +103,7 @@ void API::configure() {
   });
 
   server.on("/register", HTTP_GET, [&](AsyncWebServerRequest *request) {
-    register_master();
+    APIFunction::register_master();
     
     jsonBuffer.clear();
     JsonObject& json = jsonBuffer.createObject();
@@ -155,6 +147,9 @@ void loop() {
   if (millis() - last_time > loop_time) {
     last_time = millis();
 
+    Battery battery(BATTERY_PIN);
+    battery_level = battery.get_level();
+    
     Serial.println("Slow loop iteration:");
     switch(smart_cube_state) {
     case SmartCubeState::INITIALIZE:
@@ -164,25 +159,21 @@ void loop() {
       break;
     case SmartCubeState::WAIT_FOR_MASTER: {
       Serial.println("WAIT_FOR_MASTER");
-      Battery battery(BATTERY_PIN);
-      int level = battery.get_level();
-      led_driver.battery_level(level);
+      led_driver.battery_level(battery_level);
       break;
     }
     case SmartCubeState::MASTER_CONNECTED: {
       Serial.println("MASTER_CONNECTED");
       led_driver.single_blink(1000, LEDColour::GREEN);
       led_driver.double_blink(200, LEDColour::GREEN);
-      Battery battery(BATTERY_PIN);
-      int level = battery.get_level();
-      led_driver.battery_level(level);
+      led_driver.battery_level(battery_level);
       smart_cube_state = SmartCubeState::GAME_INITIALIZATION;
       break;
     }
     case SmartCubeState::GAME_INITIALIZATION:
       Serial.println("GAME_INITIALIZATION");
       led_driver.next_rainbow_step(hue);
-      hue += 10;
+      hue += 20;
       break;
     case SmartCubeState::GAME: {
       loop_time = 1;
@@ -193,6 +184,7 @@ void loop() {
     }
     case SmartCubeState::AFTER_GAME:
       loop_time = 500;
+      smart_cube_state = SmartCubeState::GAME_INITIALIZATION;
       break;
     }
   }
