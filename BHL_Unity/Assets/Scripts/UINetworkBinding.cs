@@ -116,7 +116,8 @@ public class UINetworkBinding : MonoBehaviour {
 
 	public void translateBatteryLevel(string jsonString){
 		BatteryInfo info = JsonUtility.FromJson<BatteryInfo> (jsonString);
-		batteryStatusController.setBatteryLevel (info.battery);
+		if(info != null)
+			batteryStatusController.setBatteryLevel (info.battery);
 	}
 
 	public void translatePictionaryInfo (string jsonString){
