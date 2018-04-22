@@ -5,6 +5,7 @@
 #include "PlayersStats.h"
 #include "Game.h"
 #include "React.h"
+#include "Pictionary.h"
 #include "SmartCubeState.h"
 #include "WiFiDriver.h"
 #include <ArduinoJson.h>
@@ -20,9 +21,6 @@ namespace APIFunction {
   }
 
   void game(int players_cnt, String game_name) {
-    Serial.println("BEIGIN");
-    Serial.println(players_cnt);
-    Serial.println(game_name);
     if (smart_cube_state != SmartCubeState::GAME_INITIALIZATION) {
       Serial.println("APIFunction::game bad state");
       return;
@@ -35,16 +33,19 @@ namespace APIFunction {
       
     if (game_name == "React") {
       game_instance = new React(players_cnt);
-    }
+    } else if (game_name == "Pictionary")
+      game_instance = new Pictionary(players_cnt);
     
     smart_cube_state = SmartCubeState::GAME;  
-
-    Serial.println("END");
   }
 
   void reset() {
     smart_cube_state = SmartCubeState::INITIALIZE;
     PlayersStats::clearStats();
+    if (game_instance) {
+      delete game_instance;
+      game_instance = nullptr;
+    }
   }
 }
 
