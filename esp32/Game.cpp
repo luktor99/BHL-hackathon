@@ -14,13 +14,13 @@ Game::Game(int players_cnt)
                   DistanceSensor(DISTANCE_PIN_4, 1000)}
 {}
 
-LEDColour Game::getRandomColour()
+PlayerColours Game::getRandomColour()
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator(seed);
     std::uniform_int_distribution<int> distribution(0,3);
     
-    return static_cast<LEDColour>(distribution(generator));  
+    return static_cast<PlayerColours>(distribution(generator));  
 }
 
 

@@ -21,7 +21,7 @@ bool React::continue_game() {
             break;
         case State::GENERATE_COLOUR:
             colour = getRandomColour();
-            led_driver.single_blink(50, static_cast<LEDColour>(colour));
+            led_driver.single_blink(50, static_cast<PlayerColours>(colour));
             time_stamp = millis();
             state = State::WAIT_FOR_REACTION;
             break;
@@ -29,8 +29,8 @@ bool React::continue_game() {
         {
             unsigned long time_diff = millis() - time_stamp;
             for(int i=0; i < 4; ++i){
-              if(distance_sensor[static_cast<LEDColour>(i)].is_activated()){
-                if(static_cast<LEDColour>(i) == colour && player_times[i] > 0){
+              if(distance_sensor[static_cast<PlayerColours>(i)].is_activated()){
+                if(static_cast<PlayerColours>(i) == colour && player_times[i] > 0){
                   player_times[i] -= time_diff;
                   state = State::UPDATE_SCORES;
                 }
@@ -62,6 +62,9 @@ bool React::continue_game() {
             else if(players_done == 4){
               winner = 4; 
               state = State::FINALIZE;
+            }
+            else{
+              state = State::GENERATE_COLOUR;
             }
             break;
         }

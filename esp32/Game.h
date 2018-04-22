@@ -3,7 +3,14 @@
 
 #include "DistanceSensor.h"
 #include <random>
-#include "LEDDriver.h"
+
+enum PlayerColours {
+  red = 0,
+  yellow = 1,
+  green = 2,
+  blue = 3,
+  undefined = 3,
+};
 
 class Game {
 public:
@@ -15,7 +22,7 @@ protected:
   int players_cnt;
   unsigned long last_time;
 
-  LEDColour getRandomColour();
+  PlayerColours getRandomColour();
 
   DistanceSensor distance_sensor[4];
 };
