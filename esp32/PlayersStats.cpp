@@ -20,8 +20,11 @@ int PlayersStats::getPlayerValue(int user)
   return ranking[user];
 }
 
-static void PlayersStats::clearStats()
+void PlayersStats::clearStats()
 {
-  
+  for(int i=0; i < NUM_LEDS; ++i)
+  {
+    ranking[i] = 0;
+  }
 }
 
