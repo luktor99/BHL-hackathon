@@ -95,6 +95,7 @@ public class UINetworkBinding : MonoBehaviour {
 	void play(){
 		NetworkController.Instance.DoPlayConfiguration ();
 		// TODO WAIT FOR SERVER RESPONSE
+		//playSuccess();
 	}
 
 	void reset(){
@@ -178,8 +179,10 @@ public class UINetworkBinding : MonoBehaviour {
 				"Accept", "Decline",
 				() => {
 					Debug.Log ("Accept was pressed");
+					NetworkController.Instance.DoAnswerBack(player, true);
 				}, () => {
-				Debug.Log ("Cancel was pressed");
+					Debug.Log ("Cancel was pressed");
+					NetworkController.Instance.DoAnswerBack(player, false);
 			});
 		}
 		//Server answers

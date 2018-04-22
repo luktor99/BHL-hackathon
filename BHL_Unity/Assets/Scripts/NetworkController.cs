@@ -23,18 +23,43 @@ public class NetworkController : MonoBehaviour {
 		StartCoroutine (PictionaryInfoPoll ());
 	}
 		
-		
-
-	void OnPlayerReadyMessage(NetworkMessage msg){
-		Debug.Log (msg.ToString ());
-	}
-
 	public void DoConnectAndRegisterPlayer(){
 		StartCoroutine (ConnectAndRegisterPlayer ());
 	}
 
 	public void DoPlayConfiguration(){
 		StartCoroutine (PlayConfiguration ());
+	}
+
+	public void DoAnswerBack(Player player, bool answer){
+		StartCoroutine (AnswerBack (player, answer));
+	}
+
+	IEnumerator AnswerBack(Player player, bool answer){
+		Debug.Log ("PictionaryInfo called");
+		UnityWebRequest wwwPoll;
+		string reqDest = "";
+		if (production) {
+			reqDest = SERVER_URL + PICTIONARY_INFO_URL + "?player="+player+"&answer="+answer;
+			wwwPoll = UnityWebRequest.Get (reqDest);
+		} else {
+			reqDest = MOCK_URL + PICTIONARY_INFO_URL + "?player="+player+"&answer="+answer;
+			wwwPoll = UnityWebRequest.Get (reqDest);
+		}
+		Debug.Log ("Request: " + reqDest);
+
+		yield return wwwPoll.SendWebRequest ();
+
+		if (wwwPoll.isNetworkError || wwwPoll.isHttpError) {
+			Debug.Log (wwwPoll.error);
+			if (Application.platform == RuntimePlatform.Android) {
+				UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
+			}
+		} else {
+			Debug.Log ("Request response code: " + wwwPoll.responseCode);
+			Debug.Log ("Request succesfull: " + wwwPoll.downloadHandler.text);
+			UINetworkBinding.Instance.translatePictionaryInfo (wwwPoll.downloadHandler.text);
+		}
 	}
 
 	public void DoReset(){
@@ -81,7 +106,7 @@ public class NetworkController : MonoBehaviour {
 
 				if (wwwPoll.isNetworkError || wwwPoll.isHttpError) {
 					Debug.Log (wwwPoll.error);
-					UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
+				    UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
 
 				} else {
 					Debug.Log ("Request response code: " + wwwPoll.responseCode);
