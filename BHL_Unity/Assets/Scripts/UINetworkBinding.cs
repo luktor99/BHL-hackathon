@@ -99,8 +99,24 @@ public class UINetworkBinding : MonoBehaviour {
 		}
 	}
 
+	public void showPictionaryDialog(Player player){
+		if (Application.platform == RuntimePlatform.Android) {
+			MobileNativePopups.OpenAlertDialog (
+				"Player " + player + " answers!", "Accept or decline his answer.",
+				"Accept", "Decline",
+				() => {
+					Debug.Log ("Accept was pressed");
+				}, () => {
+				Debug.Log ("Cancel was pressed");
+			});
+		}
+		//Server answers
+	}
+
 	public void toastServerError( long errorCode ){
-		AndroidNativePopups.OpenToast("Connection error, code: " + errorCode, AndroidNativePopups.ToastDuration.Long);
+		if (Application.platform == RuntimePlatform.Android) {
+			AndroidNativePopups.OpenToast ("Connection error, code: " + errorCode, AndroidNativePopups.ToastDuration.Long);
+		}
 	}
 
 

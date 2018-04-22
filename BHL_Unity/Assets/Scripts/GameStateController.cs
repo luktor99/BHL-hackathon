@@ -15,6 +15,14 @@ public enum AppState
 	PICTIONARY
 };
 
+public enum Player
+{
+	RED,
+	BLUE,
+	YELLLOW,
+	GREEN
+};
+
 
 public class GameStateController : MonoBehaviour {
 

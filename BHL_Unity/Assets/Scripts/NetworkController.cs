@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Timers;
 
 public class NetworkController : MonoBehaviour {
 
@@ -11,8 +12,21 @@ public class NetworkController : MonoBehaviour {
 	const string MOCK_URL = "https://c74d8ef8-bac3-40a0-a41e-1c6e1bf1a51a.mock.pstmn.io";
 	const string REGISTRATION_URL = "/register";
 	const string GAME_URL = "/game?params=";
+	const string REFLEX_INFO_URL = "/reflex";
+	const string PICTIONARY_INFO_URL = "/kalam";
 
 
+
+	void Start(){
+		StartCoroutine (ReflexInfoPoll ());
+		StartCoroutine (PictionaryInfoPoll ());
+	}
+		
+		
+
+	void OnPlayerReadyMessage(NetworkMessage msg){
+		Debug.Log (msg.ToString ());
+	}
 
 	public void DoConnectAndRegisterPlayer(){
 		StartCoroutine (ConnectAndRegisterPlayer ());
@@ -20,6 +34,73 @@ public class NetworkController : MonoBehaviour {
 
 	public void DoPlayConfiguration(){
 		StartCoroutine (PlayConfiguration ());
+	}
+
+	IEnumerator ReflexInfoPoll(){
+		while (true) {
+			if (GameStateController.Instance.getCurrentGame () == Game.REFLEX) {
+				Debug.Log ("ReflexInfo called");
+				UnityWebRequest wwwPoll;
+				string reqDest = "";
+				if (production) {
+					reqDest = SERVER_URL + REFLEX_INFO_URL;
+					wwwPoll = UnityWebRequest.Get (reqDest);
+				} else {
+					reqDest = MOCK_URL + REFLEX_INFO_URL;
+					wwwPoll = UnityWebRequest.Get (reqDest);
+				}
+				Debug.Log ("Request: " + reqDest);
+
+				yield return wwwPoll.SendWebRequest ();
+
+				if (wwwPoll.isNetworkError || wwwPoll.isHttpError) {
+					Debug.Log (wwwPoll.error);
+					if (Application.platform == RuntimePlatform.Android) {
+						UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
+					}
+				} else {
+					Debug.Log ("Request response code: " + wwwPoll.responseCode);
+					Debug.Log ("Request succesfull: " + wwwPoll.downloadHandler.text);
+					// TODO INTERPRET REFLEX INFO
+				}	
+			}
+			yield return new WaitForSeconds (0.2f);
+			Debug.Log ("After timer");
+		}
+
+	}
+
+	IEnumerator PictionaryInfoPoll(){
+		while (true) {
+			if (GameStateController.Instance.getCurrentGame () == Game.PICTIONARY) {
+				Debug.Log ("PictionaryInfo called");
+				UnityWebRequest wwwPoll;
+				string reqDest = "";
+				if (production) {
+					reqDest = SERVER_URL + PICTIONARY_INFO_URL;
+					wwwPoll = UnityWebRequest.Get (reqDest);
+				} else {
+					reqDest = MOCK_URL + PICTIONARY_INFO_URL;
+					wwwPoll = UnityWebRequest.Get (reqDest);
+				}
+				Debug.Log ("Request: " + reqDest);
+
+				yield return wwwPoll.SendWebRequest ();
+
+				if (wwwPoll.isNetworkError || wwwPoll.isHttpError) {
+					Debug.Log (wwwPoll.error);
+					if (Application.platform == RuntimePlatform.Android) {
+						UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
+					}
+				} else {
+					Debug.Log ("Request response code: " + wwwPoll.responseCode);
+					Debug.Log ("Request succesfull: " + wwwPoll.downloadHandler.text);
+					// TODO INTERPRET PICT INFO
+				}
+			}
+			yield return new WaitForSeconds (0.2f);
+		}
+
 	}
 
 	IEnumerator PlayConfiguration(){
