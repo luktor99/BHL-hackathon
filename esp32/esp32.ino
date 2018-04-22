@@ -73,6 +73,22 @@ API::API() {
 }
 
 void API::configure() {
+  server.on("/game", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    AsyncWebParameter* players_count = request->getParam(0);
+    AsyncWebParameter* game = request->getParam(1);
+
+    // Do sth with players_count->value().toInt() and game->value()
+    
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = 2;
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
+  
   server.on("/pictionary", HTTP_GET, [&](AsyncWebServerRequest *request) {
     jsonBuffer.clear();
     JsonObject& json = jsonBuffer.createObject();
@@ -122,9 +138,6 @@ void loop() {
   if (millis() - last_time > loop_time) {
     last_time = millis();
 
-    Battery battery(BATTERY_PIN);
-    battery_level = battery.get_level();
-    
     Serial.println("Slow loop iteration:");
     switch(smart_cube_state) {
     case SmartCubeState::INITIALIZE:
@@ -134,21 +147,25 @@ void loop() {
       break;
     case SmartCubeState::WAIT_FOR_MASTER: {
       Serial.println("WAIT_FOR_MASTER");
-      led_driver.battery_level(battery_level);
+      Battery battery(BATTERY_PIN);
+      int level = battery.get_level();
+      led_driver.battery_level(level);
       break;
     }
     case SmartCubeState::MASTER_CONNECTED: {
       Serial.println("MASTER_CONNECTED");
       led_driver.single_blink(1000, LEDColour::GREEN);
       led_driver.double_blink(200, LEDColour::GREEN);
-      led_driver.battery_level(battery_level);
+      Battery battery(BATTERY_PIN);
+      int level = battery.get_level();
+      led_driver.battery_level(level);
       smart_cube_state = SmartCubeState::GAME_INITIALIZATION;
       break;
     }
     case SmartCubeState::GAME_INITIALIZATION:
       Serial.println("GAME_INITIALIZATION");
       led_driver.next_rainbow_step(hue);
-      hue += 20;
+      hue += 10;
       break;
     case SmartCubeState::GAME: {
       loop_time = 1;
@@ -159,7 +176,6 @@ void loop() {
     }
     case SmartCubeState::AFTER_GAME:
       loop_time = 500;
-      smart_cube_state = SmartCubeState::GAME_INITIALIZATION;
       break;
     }
   }
