@@ -21,17 +21,7 @@ LEDColour Game::getRandomColour()
     std::uniform_int_distribution<int> distribution(0,4);
     
     int colour = distribution(generator);  
-    switch(colour){
-      case 0:
-        return LEDColour::RED;
-      case 1:
-        return LEDColour::YELLOW;
-      case 2:
-        return LEDColour::GREEN;
-      case 3:
-        return LEDColour::BLUE;
-    }
-    
+    return IntToLEDColour(colour);
 }
 
 int Game::LEDColourToInt(LEDColour colour){
@@ -44,6 +34,20 @@ int Game::LEDColourToInt(LEDColour colour){
         return 2;
       case LEDColour::BLUE:
         return 3;
+    }
+}
+
+
+LEDColour Game::IntToLEDColour(int colour){
+  switch(colour){
+      case 0:
+        return LEDColour::RED;
+      case 1:
+        return LEDColour::YELLOW;
+      case 2:
+        return LEDColour::GREEN;
+      case 3:
+        return LEDColour::BLUE;
     }
 }
 

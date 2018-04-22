@@ -6,7 +6,7 @@
 Pictionary::Pictionary(int players_cnt)
   : Game(players_cnt),
   state(State::WAIT_FOR_REACTION),
-  colour(undefined)
+  colour(LEDColour::RED)
 { }
 
 bool Pictionary::continue_game() {
@@ -16,9 +16,9 @@ bool Pictionary::continue_game() {
 
     for(int i=0; i < 4; ++i)
     {
-      if(distance_sensor[static_cast<LEDColour>(i)].is_activated())
+      if(distance_sensor[i].is_activated())
       {
-          colour = static_cast<PlayerColours>(i);     
+          colour = IntToLEDColour(i);     
 
           state = State::UPDATE_SCORES;
       }
@@ -33,12 +33,12 @@ bool Pictionary::continue_game() {
   }
 }
 
-PlayerColours Pictionary::getActivatedSensor()
+LEDColour Pictionary::getActivatedSensor()
 {
   return colour;
 }
 
-void Pictionary::getActivatedSensor(PlayerColours col)
+void Pictionary::getActivatedSensor(LEDColour col)
 {
   colour = col;
 }

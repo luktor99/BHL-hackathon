@@ -20,6 +20,8 @@ protected:
   int LEDColourToInt(LEDColour colour);
 
   DistanceSensor distance_sensor[4];
+
+  LEDColour IntToLEDColour(int colour);
 };
 
 extern Game *game_instance;
