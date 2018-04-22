@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class NetworkController : MonoBehaviour {
 
-	const bool production = true;
+	const bool production = false;
 
 	const string SERVER_URL = "http://192.168.4.1";
 	const string MOCK_URL = "https://c74d8ef8-bac3-40a0-a41e-1c6e1bf1a51a.mock.pstmn.io";
