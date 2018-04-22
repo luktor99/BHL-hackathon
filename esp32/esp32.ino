@@ -33,7 +33,7 @@ namespace APIFunction {
       
     if (game_name == "React") {
       game_instance = new React(players_cnt);
-    } else if (game_name == "Pictionary")
+    } else if (game_name == "pictionary")
       game_instance = new Pictionary(players_cnt);
     
     smart_cube_state = SmartCubeState::GAME;  

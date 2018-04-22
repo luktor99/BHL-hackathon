@@ -6,8 +6,6 @@
 
 const unsigned int answer_timeout = 5000;
 
-
-
 Pictionary::Pictionary(int players_cnt)
   : Game(players_cnt),
   state(State::GENERATE_COLOUR)
@@ -21,9 +19,11 @@ bool Pictionary::continue_game() {
     
   case State::GENERATE_COLOUR:
   {
+    Serial.println("Pictionary: GENERATE_COLOUR state");
     answered = INVALID;
     for(int i = 0; i < players_cnt; ++i){
       if(distance_sensor[i].is_activated()){
+        Serial.println("Pictionary: Setting person showing");
         led_driver.set_first(4,IntToLEDColour(i));
         person_showing = i;
         state = State::WAIT_FOR_REACTION;
@@ -35,8 +35,10 @@ bool Pictionary::continue_game() {
   }
   
   case State::WAIT_FOR_REACTION:
+  Serial.println("Pictionary: WAIT_FOR_REACTION state");
     for(int i = 0; i < players_cnt; ++i){
       if(distance_sensor[i].is_activated()){
+        Serial.println("Pictionary: Person answering chosen");
         led_driver.set_first(4,IntToLEDColour(i));
         winner = i;
         previous_time = millis();
@@ -49,11 +51,13 @@ bool Pictionary::continue_game() {
     
   case State::WAIT_FOR_ANSWER:
     if(millis()-previous_time > answer_timeout || answered == INVALID){
+      Serial.println("Pictionary: Timeout, no answer or wrong answer");
       answered = UNDEFINED;
       led_driver.double_blink(300, LEDColour::RED);
       state = State::WAIT_FOR_REACTION;
     }
     else if(answered == VALID){
+      Serial.println("Pictionary: Correct answer!!");
       answered == UNDEFINED;
       led_driver.double_blink(300, LEDColour::GREEN);
       state = State::FINALIZE;
@@ -62,6 +66,7 @@ bool Pictionary::continue_game() {
     
   case State::FINALIZE:
     if(winner < 4){
+      Serial.println("Pictionary: Quitting");
       PlayersStats::setNowShowing(person_showing) ;
       PlayersStats::setNowAnswering(winner);
       PlayersStats::setTimeStamp(millis());
