@@ -1,5 +1,6 @@
 #include "PlayersStats.h"
 
+int PlayersStats::ranking[NUM_LEDS];
 
 PlayersStats::PlayersStats()
 {
@@ -17,5 +18,10 @@ void PlayersStats::setPlayerValue(int user, int value)
 int PlayersStats::getPlayerValue(int user)
 {
   return ranking[user];
+}
+
+static void PlayersStats::clearStats()
+{
+  
 }
 

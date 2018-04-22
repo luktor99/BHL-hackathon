@@ -1,20 +1,26 @@
-#include "Puns.h"
+#include "Pictionary.h"
 #include "LEDDriver.h"
 
 #include <Arduino.h>
 
-Puns::Puns(int players_cnt)
+Pictionary::Pictionary(int players_cnt)
   : Game(players_cnt),
   state(State::GENERATE_COLOUR),
   colour(0)
-{}
+{
 
-bool Puns::continue_game() {
+}
+
+bool Pictionary::continue_game() {
   switch(state) {
   case State::GENERATE_COLOUR:
-     // get random colour
-    colour = 0;
+
+    const auto color = getRandomColor();
+    led_driver.set_first(color, static_cast<LEDColour>(colour));
+
+    // To DO; SEND info to client.
     state = State::WAIT_FOR_REACTION;
+    
     break;
   case State::WAIT_FOR_REACTION: 
     state = State::FINALIZE;

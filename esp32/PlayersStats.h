@@ -9,11 +9,13 @@ public:
    PlayersStats();
    ~PlayersStats();
 
-  void setPlayerValue(int user, int value);
-  int getPlayerValue(int user);
+  static void setPlayerValue(int user, int value);
+  static int getPlayerValue(int user);
+
+  static void clearStats();
      
 private:
-    int ranking[NUM_LEDS];
+    static int ranking[NUM_LEDS];
 };
 #endif
 

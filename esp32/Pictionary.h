@@ -3,7 +3,7 @@
 
 #include "Game.h"
 
-class Puns : public Game {
+class Pictionary : public Game {
 public:
   enum class State {
     GENERATE_COLOUR,
@@ -11,7 +11,7 @@ public:
     FINALIZE
   };
 
-  Puns(int players_cnt);
+  Pictionary(int players_cnt);
 
   bool continue_game() override;
   

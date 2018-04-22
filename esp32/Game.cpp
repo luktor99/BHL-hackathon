@@ -13,9 +13,10 @@ Game::Game(int players_cnt)
                   DistanceSensor(DISTANCE_PIN_4, 1000)}
 {}
 
-LEDColour Game::getRandomColour(){
+LEDColour Game::getRandomColour()
+{
     std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(0,3);
     return distribution(generator);  
-  }
+}
 
