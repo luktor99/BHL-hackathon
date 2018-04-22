@@ -5,26 +5,24 @@
 
 Pictionary::Pictionary(int players_cnt)
   : Game(players_cnt),
-  state(State::GENERATE_COLOUR),
+  state(State::WAIT_FOR_REACTION),
   colour(0)
-{
-
-}
+{ }
 
 bool Pictionary::continue_game() {
-  switch(state) {
-  case State::GENERATE_COLOUR:
+  switch(state) 
   {
-
-    const auto color = getRandomColour();
-    led_driver.set_first(color, static_cast<LEDColour>(colour));
-
-    // To DO; SEND info to client.
-    state = State::WAIT_FOR_REACTION;
-  }
-    break;
   case State::WAIT_FOR_REACTION: 
-    state = State::FINALIZE;
+
+    for(int i=0; i < 4; ++i)
+    {
+      if(distance_sensor[static_cast<LEDColour>(i)].is_activated())
+      {
+                         
+      }
+    }
+    
+    state = State::UPDATE_SCORES;
     break;
   
   case State::FINALIZE:

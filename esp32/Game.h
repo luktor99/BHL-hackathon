@@ -9,7 +9,7 @@ enum PlayerColours {
   yellow = 1,
   green = 2,
   blue = 3,
-  undefined = 3,
+  undefined = 4,
 };
 
 class Game {
