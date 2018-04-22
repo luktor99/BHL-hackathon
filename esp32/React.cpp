@@ -14,7 +14,9 @@ React::React(int players_cnt)
 bool React::continue_game() {
     switch(state) {
         case State::GAME_START:
-            player_times[i] = max_waiting_time;
+            for(int i = 0; i < 4; ++i){
+               player_times[i] = max_waiting_time;
+            }
             break;
         case State::GENERATE_COLOUR:
             colour = getRandomColour();
@@ -22,7 +24,8 @@ bool React::continue_game() {
             time_stamp = millis();
             state = State::WAIT_FOR_REACTION;
             break;
-        case State::WAIT_FOR_REACTION
+        case State::WAIT_FOR_REACTION:
+        {
             unsigned long time_diff = millis() - time_stamp;
             for(int i=0; i < 4; ++i){
               if(distance_sensor[static_cast<LEDColour>(i)].is_activated()){
@@ -39,7 +42,9 @@ bool React::continue_game() {
               state = State::UPDATE_SCORES;
             }
             break;
+        }
         case State::UPDATE_SCORES:
+        {
             int players_done = 0; 
             for(int i = 0; i < 4; ++i){
               if(player_times[i] <= 0){
@@ -47,9 +52,11 @@ bool React::continue_game() {
                 ++players_done;
               }
               if(players_done > 2){
-                state =  State::FINALIZE;
+                state = State::FINALIZE;
               }
+              break;
             }
+        }
         case State::FINALIZE:
             return false;
     }

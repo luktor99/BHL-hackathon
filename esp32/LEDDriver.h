@@ -7,11 +7,11 @@
 #define LED_DATA_PIN 23 
 #define NUM_LEDS 4
 
-struct LEDColour {
-  static const int RED = 0;
-  static const int YELLOW = 42;
-  static const int GREEN = 85;
-  static const int BLUE = 171;
+enum LEDColour {
+  RED = 0,
+  YELLOW = 1,
+  GREEN = 2,
+  BLUE = 3,
 };
 
 class LEDDriver {
