@@ -4,12 +4,12 @@
 #include "DistanceSensor.h"
 #include <random>
 
-enum PlayerColours {
+enum PlayerColours : int {
   red = 0,
   yellow = 1,
   green = 2,
   blue = 3,
-  undefined = 3,
+  undefined = 4,
 };
 
 class Game {
