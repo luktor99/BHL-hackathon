@@ -86,8 +86,9 @@ void API::configure() {
     JsonObject& json = jsonBuffer.createObject();
     
     json["battery"] = battery_level;
-    json["now_showing"] = "red";
-    json["now_answering"] = "none";
+    json["time_stamp"] = PlayersStats::getTimeStamp();
+    json["now_showing"] = PlayersStats::getNowShowing();
+    json["now_answering"] = PlayersStats::getNowAnswering();
     json["red"] = PlayersStats::getPlayerValue(0);
     json["blue"] = PlayersStats::getPlayerValue(1);
     json["green"] = PlayersStats::getPlayerValue(2);
