@@ -21,7 +21,7 @@ public:
 private:
   unsigned long time_stamp;
   State state;
-  int colour;
+  LEDColour colour;
 
   int player_times[4];
 

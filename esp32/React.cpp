@@ -8,7 +8,7 @@ React::React(int players_cnt)
         : Game(players_cnt),
           time_stamp(0),
           state(State::GAME_START),
-          colour(0)
+          colour(LEDColour::RED)
 {}
 
 bool React::continue_game() {
@@ -21,7 +21,7 @@ bool React::continue_game() {
             break;
         case State::GENERATE_COLOUR:
             colour = getRandomColour();
-            led_driver.single_blink(50, static_cast<PlayerColours>(colour));
+            led_driver.single_blink(50, colour);
             time_stamp = millis();
             state = State::WAIT_FOR_REACTION;
             break;
@@ -29,8 +29,8 @@ bool React::continue_game() {
         {
             unsigned long time_diff = millis() - time_stamp;
             for(int i=0; i < 4; ++i){
-              if(distance_sensor[static_cast<PlayerColours>(i)].is_activated()){
-                if(static_cast<PlayerColours>(i) == colour && player_times[i] > 0){
+              if(distance_sensor[i].is_activated()){
+                if( i == LEDColourToInt(colour) && player_times[i] > 0){
                   player_times[i] -= time_diff;
                   state = State::UPDATE_SCORES;
                 }
