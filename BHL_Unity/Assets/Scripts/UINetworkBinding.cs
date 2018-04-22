@@ -45,7 +45,7 @@ public class UINetworkBinding : MonoBehaviour {
 
 	public BatteryStatusUIController batteryStatusController;
 
-
+	long lastTimeStamp = 0;
 
 
 	// Use this for initialization
@@ -122,6 +122,7 @@ public class UINetworkBinding : MonoBehaviour {
 	}
 
 	public void translatePictionaryInfo (string jsonString){
+		
 		PictionaryInfo info = JsonUtility.FromJson<PictionaryInfo> (jsonString);
 		if (info == null) {
 			return;
@@ -137,16 +138,20 @@ public class UINetworkBinding : MonoBehaviour {
 			playerColorBackground.color = Color.yellow;
 		}
 
-		if (info.now_answering == "red") {
-			showPictionaryDialog (Player.RED);
-		} else if (info.now_answering == "blue") {
-			showPictionaryDialog (Player.BLUE);
-		} else if (info.now_answering == "green") {
-			showPictionaryDialog (Player.GREEN);
-		} else if (info.now_answering == "yellow") {
-			showPictionaryDialog (Player.YELLLOW);
+
+		if (lastTimeStamp != info.time_stamp) {
+			if (info.now_answering == "red") {
+				showPictionaryDialog (Player.RED);
+			} else if (info.now_answering == "blue") {
+				showPictionaryDialog (Player.BLUE);
+			} else if (info.now_answering == "green") {
+				showPictionaryDialog (Player.GREEN);
+			} else if (info.now_answering == "yellow") {
+				showPictionaryDialog (Player.YELLLOW);
+			}
 		}
 
+		lastTimeStamp = info.time_stamp;
 		pictionaryRedScore.text = info.red;
 		pictionaryBlueScore.text = info.blue;
 		pictionaryYellowScore.text = info.yellow;

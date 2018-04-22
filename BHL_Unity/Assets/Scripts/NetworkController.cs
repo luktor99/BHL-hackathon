@@ -15,6 +15,7 @@ public class NetworkController : MonoBehaviour {
 	const string REFLEX_INFO_URL = "/react";
 	const string PICTIONARY_INFO_URL = "/pictionary";
 	const string RESET_URL = "/reset";
+	const string ANSWER_URL = "/answer?ans=";
 
 
 
@@ -39,11 +40,18 @@ public class NetworkController : MonoBehaviour {
 		Debug.Log ("PictionaryInfo called");
 		UnityWebRequest wwwPoll;
 		string reqDest = "";
+		string answerString = "";
+		if (answer) {
+			answerString = "true";
+		} else {
+			answerString = "false";
+		}
 		if (production) {
-			reqDest = SERVER_URL + PICTIONARY_INFO_URL + "?player="+player+"&answer="+answer;
+			
+			reqDest = SERVER_URL + ANSWER_URL + answerString;
 			wwwPoll = UnityWebRequest.Get (reqDest);
 		} else {
-			reqDest = MOCK_URL + PICTIONARY_INFO_URL + "?player="+player+"&answer="+answer;
+			reqDest = MOCK_URL + ANSWER_URL + answerString;
 			wwwPoll = UnityWebRequest.Get (reqDest);
 		}
 		Debug.Log ("Request: " + reqDest);
@@ -52,9 +60,7 @@ public class NetworkController : MonoBehaviour {
 
 		if (wwwPoll.isNetworkError || wwwPoll.isHttpError) {
 			Debug.Log (wwwPoll.error);
-			if (Application.platform == RuntimePlatform.Android) {
-				UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
-			}
+			UINetworkBinding.Instance.toastServerError (wwwPoll.responseCode);
 		} else {
 			Debug.Log ("Request response code: " + wwwPoll.responseCode);
 			Debug.Log ("Request succesfull: " + wwwPoll.downloadHandler.text);
