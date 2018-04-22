@@ -14,8 +14,8 @@ public:
 
   static void clearStats();
 
-  static void setNowShowing(String colour);
-  static void setNowAnswering(String colour);
+  static void setNowShowing(int colour);
+  static void setNowAnswering(int colour);
   static void setTimeStamp(unsigned long stamp);
 
   static String getNowShowing();

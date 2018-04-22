@@ -31,12 +31,25 @@ void PlayersStats::clearStats()
   }
 }
 
-void PlayersStats::setNowShowing(String colour) {
-  now_showing = colour;
+namespace {
+  String IntToColourASCII(int colour) {
+    if (colour == 0)
+      return "red";
+    else if (colour == 1)
+      return "yellow";
+    else if (colour == 2)
+      return "green";
+    else
+      return "blue";
+  }
 }
 
-void PlayersStats::setNowAnswering(String colour) {
-  now_answering = colour;
+void PlayersStats::setNowShowing(int colour) {
+  now_showing = IntToColourASCII(colour);
+}
+
+void PlayersStats::setNowAnswering(int colour) {
+  now_answering = IntToColourASCII(colour);
 }
 
 void PlayersStats::setTimeStamp(unsigned long stamp) {
