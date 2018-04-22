@@ -210,7 +210,7 @@ void loop() {
       break;
     case SmartCubeState::WAIT_FOR_MASTER: {
       Serial.println("WAIT_FOR_MASTER");
-      //led_driver.battery_level(battery_level);
+      led_driver.battery_level(battery_level);
       break;
     }
     case SmartCubeState::MASTER_CONNECTED: {

@@ -60,4 +60,24 @@ void LEDDriver::player_default_colours() {
   leds[3] = CHSV(LEDColour::BLUE,255,255);
   FastLED.show();
 }
+//
+//void LEDDriver::blink_opposite(int ms) {
+//  leds[0] = CHSV(LEDColour::RED,255,255);
+//  leds[1] = CHSV(0,0,0);
+//  leds[2] = CHSV(LEDColour::RED,255,255);
+//  leds[3] = CHSV(0,0,0);
+//  FastLED.show();
+//
+//  leds[0] = CHSV(LEDColour::RED,255,255);
+//  leds[1] = CHSV(LEDColour::YELLOW,255,255);
+//  leds[2] = CHSV(LEDColour::GREEN,255,255);
+//  leds[3] = CHSV(LEDColour::BLUE,255,255);
+//  FastLED.show();
+//
+//  leds[0] = CHSV(LEDColour::RED,255,255);
+//  leds[1] = CHSV(LEDColour::YELLOW,255,255);
+//  leds[2] = CHSV(LEDColour::GREEN,255,255);
+//  leds[3] = CHSV(LEDColour::BLUE,255,255);
+//  FastLED.show();
+//}
 

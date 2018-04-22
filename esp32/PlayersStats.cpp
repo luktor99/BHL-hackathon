@@ -3,7 +3,7 @@
 int PlayersStats::ranking[NUM_LEDS];
 String PlayersStats::now_showing = "none";
 String PlayersStats::now_answering = "none";
-unsigned long PlayersStats::time_stamp = millis();
+unsigned int PlayersStats::time_stamp = millis();
 
 PlayersStats::PlayersStats()
 {
@@ -39,8 +39,10 @@ namespace {
       return "yellow";
     else if (colour == 2)
       return "green";
-    else
+    else if (colour == 3)
       return "blue";
+    else
+      return "none";
   }
 }
 

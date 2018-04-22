@@ -28,7 +28,7 @@ private:
 
     static String now_showing;
     static String now_answering;
-    static unsigned long time_stamp;
+    static unsigned int time_stamp;
 };
 #endif
 

@@ -25,6 +25,7 @@ public:
   void player_default_colours();
 
    void set_first(int count, int hue);
+   void blink_opposite(int ms);
   
 private:
   CRGBArray<NUM_LEDS> leds;

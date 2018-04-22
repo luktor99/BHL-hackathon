@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "PlayersStats.h"
 
-const unsigned int answer_timeout = 5000;
+const unsigned int answer_timeout = 10000;
 
 Pictionary::Pictionary(int players_cnt)
   : Game(players_cnt),
@@ -16,9 +16,7 @@ bool Pictionary::continue_game() {
   static int person_showing = 4;
   static int previous_time = 0;
   switch(state) {
-    
-  case State::GENERATE_COLOUR:
-  {
+  case State::GENERATE_COLOUR: {
     Serial.println("Pictionary: GENERATE_COLOUR state");
     answered = INVALID;
     for(int i = 0; i < players_cnt; ++i){
@@ -27,13 +25,14 @@ bool Pictionary::continue_game() {
         led_driver.set_first(4,IntToLEDColour(i));
         person_showing = i;
         state = State::WAIT_FOR_REACTION;
+
+        PlayersStats::setNowShowing(person_showing);
+        PlayersStats::setTimeStamp(millis());
         break;
       } 
     }
-    state = State::GENERATE_COLOUR;
     break;
   }
-  
   case State::WAIT_FOR_REACTION:
   Serial.println("Pictionary: WAIT_FOR_REACTION state");
     for(int i = 0; i < players_cnt; ++i){
@@ -43,10 +42,12 @@ bool Pictionary::continue_game() {
         winner = i;
         previous_time = millis();
         state = State::WAIT_FOR_ANSWER;
+
+        PlayersStats::setNowAnswering(winner);
+        PlayersStats::setTimeStamp(millis());
         break;
       }
     }
-    state = State::WAIT_FOR_REACTION;
     break;
     
   case State::WAIT_FOR_ANSWER:
@@ -55,12 +56,16 @@ bool Pictionary::continue_game() {
       answered = UNDEFINED;
       led_driver.double_blink(300, LEDColour::RED);
       state = State::WAIT_FOR_REACTION;
+      PlayersStats::setNowAnswering(-1);
+      PlayersStats::setTimeStamp(millis());
     }
     else if(answered == VALID){
       Serial.println("Pictionary: Correct answer!!");
       answered == UNDEFINED;
       led_driver.double_blink(300, LEDColour::GREEN);
       state = State::FINALIZE;
+      PlayersStats::setNowAnswering(winner);
+      PlayersStats::setTimeStamp(millis());
     }
     break;
     
