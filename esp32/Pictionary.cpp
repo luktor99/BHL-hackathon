@@ -14,13 +14,14 @@ Pictionary::Pictionary(int players_cnt)
 bool Pictionary::continue_game() {
   switch(state) {
   case State::GENERATE_COLOUR:
+  {
 
-    const auto color = getRandomColor();
+    const auto color = getRandomColour();
     led_driver.set_first(color, static_cast<LEDColour>(colour));
 
     // To DO; SEND info to client.
     state = State::WAIT_FOR_REACTION;
-    
+  }
     break;
   case State::WAIT_FOR_REACTION: 
     state = State::FINALIZE;

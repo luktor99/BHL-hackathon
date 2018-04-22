@@ -58,6 +58,7 @@ bool React::continue_game() {
             }
         }
         case State::FINALIZE:
+            
             return false;
     }
     return false;
