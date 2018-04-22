@@ -14,13 +14,13 @@ public:
   Pictionary(int players_cnt);
 
   bool continue_game() override;
-
-  LEDColour getActivatedSensor();
+  PlayerColours getActivatedSensor();
+  void getActivatedSensor(PlayerColours col);
   
 private:
  
   State state;
-  int colour;;
+  PlayerColours colour;
 };
 
 #endif
