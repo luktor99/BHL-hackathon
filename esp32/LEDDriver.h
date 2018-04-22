@@ -22,6 +22,7 @@ public:
   void double_blink(int ms, int hue);
   void next_rainbow_step(int hue);
   void battery_level(int level);
+  void player_default_colours();
 
    void set_first(int count, int hue);
   

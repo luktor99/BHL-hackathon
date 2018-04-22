@@ -195,8 +195,7 @@ void loop() {
     }
     case SmartCubeState::GAME_INITIALIZATION:
       Serial.println("GAME_INITIALIZATION");
-      led_driver.next_rainbow_step(hue);
-      hue += 20;
+      led_driver.player_default_colours();
       break;
     case SmartCubeState::GAME: {
       loop_time = 1;
