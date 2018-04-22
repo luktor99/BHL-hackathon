@@ -10,24 +10,13 @@
 #include <ArduinoJson.h>
 
 // API.h /////////////////////////////////////////////////////////////////
-// libraries => https://github.com/marcoschwartz/aREST
-#include <aREST.h>
-
-namespace APIVariable {
-  bool state = true;
-  int temperature = 25;
-  String nick = "hot20";
-}
-
 namespace APIFunction {
-  int register_master(String) {
+  void register_master() {
     if (smart_cube_state != SmartCubeState::WAIT_FOR_MASTER) {
       Serial.println("APIFunction::register_master bad state");
-      return 1;
+      return
     }
-    
     smart_cube_state = SmartCubeState::MASTER_CONNECTED;
-    return 0;
   }
 
   int game(String cmd) {
@@ -77,13 +66,41 @@ void API::configure() {
     jsonBuffer.clear();
     JsonObject& json = jsonBuffer.createObject();
     
-    json["battery"] = 2;
+    json["battery"] = battery_level;
     json["now_showing"] = "red";
     json["now_answering"] = "none";
-    json["red"] = 2;
-    json["blue"] = 1;
-    json["green"] = 5;
-    json["yellow"] = 8;
+    json["red"] = PlayersStats::getPlayerValue(0);
+    json["blue"] = PlayersStats::getPlayerValue(1);
+    json["green"] = PlayersStats::getPlayerValue(2);
+    json["yellow"] = PlayersStats::getPlayerValue(3);
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
+
+  server.on("/react", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = battery_level;
+    json["red"] = PlayersStats::getPlayerValue(0);
+    json["blue"] = PlayersStats::getPlayerValue(1);
+    json["green"] = PlayersStats::getPlayerValue(2);
+    json["yellow"] = PlayersStats::getPlayerValue(3);
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
+
+  server.on("/register", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    register_master();
+    
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = battery_level;
     
     String jsonString;
     json.printTo(jsonString);
