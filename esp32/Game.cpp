@@ -17,6 +17,11 @@ LEDColour Game::getRandomColour()
 {
     std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(0,3);
+<<<<<<< HEAD
     return distribution(generator);  
 }
+=======
+    return static_cast<LEDColour>(distribution(generator));  
+  }
+>>>>>>> 60da644cb884f2367313a2af92594ccc929fc60d
 

@@ -7,6 +7,7 @@
 #include "React.h"
 #include "SmartCubeState.h"
 #include "WiFiDriver.h"
+#include <ArduinoJson.h>
 
 // API.h /////////////////////////////////////////////////////////////////
 // libraries => https://github.com/marcoschwartz/aREST
@@ -64,24 +65,30 @@ public:
   void handle_request(WiFiServer &server);
   
 private:
-  aREST rest;
+  StaticJsonBuffer<200> jsonBuffer;
 };
 
 // API.cpp ///////////////////////////////////////////////////////////////
-API::API()
-  : rest(aREST())
-{}
+API::API() {
+}
 
 void API::configure() {
-  rest.variable("state", &APIVariable::state);
-  rest.variable("temperature", &APIVariable::temperature);
-  rest.variable("nick", &APIVariable::nick);
-  
-  rest.function((char*)"register", APIFunction::register_master);
-  rest.function((char*)"game", APIFunction::game);
-
-  rest.set_id("123456");
-  rest.set_name((char*)"SmartCube");
+  server.on("/pictionary", HTTP_GET, [&](AsyncWebServerRequest *request) {
+    jsonBuffer.clear();
+    JsonObject& json = jsonBuffer.createObject();
+    
+    json["battery"] = 2;
+    json["now_showing"] = "red";
+    json["now_answering"] = "none";
+    json["red"] = 2;
+    json["blue"] = 1;
+    json["green"] = 5;
+    json["yellow"] = 8;
+    
+    String jsonString;
+    json.printTo(jsonString);
+    request->send(200, "application/json", jsonString);
+  });
 }
 
 void API::handle_request(WiFiServer &server) {
@@ -92,7 +99,6 @@ void API::handle_request(WiFiServer &server) {
   while(!client.available()){
     delay(1);
   }
-  rest.handle(client);
 }
 
 // code //////////////////////////////////////////////////////////////////
@@ -111,13 +117,14 @@ void setup() {
 
 static uint8_t hue = 0;
 void loop() {
-  api.handle_request(server);
-
   static unsigned long last_time = millis();
   static unsigned long loop_time = 500;
   if (millis() - last_time > loop_time) {
     last_time = millis();
 
+    Battery battery(BATTERY_PIN);
+    battery_level = battery.get_level();
+    
     Serial.println("Slow loop iteration:");
     switch(smart_cube_state) {
     case SmartCubeState::INITIALIZE:
@@ -127,25 +134,21 @@ void loop() {
       break;
     case SmartCubeState::WAIT_FOR_MASTER: {
       Serial.println("WAIT_FOR_MASTER");
-      Battery battery(BATTERY_PIN);
-      int level = battery.get_level();
-      led_driver.battery_level(level);
+      led_driver.battery_level(battery_level);
       break;
     }
     case SmartCubeState::MASTER_CONNECTED: {
       Serial.println("MASTER_CONNECTED");
       led_driver.single_blink(1000, LEDColour::GREEN);
       led_driver.double_blink(200, LEDColour::GREEN);
-      Battery battery(BATTERY_PIN);
-      int level = battery.get_level();
-      led_driver.battery_level(level);
+      led_driver.battery_level(battery_level);
       smart_cube_state = SmartCubeState::GAME_INITIALIZATION;
       break;
     }
     case SmartCubeState::GAME_INITIALIZATION:
       Serial.println("GAME_INITIALIZATION");
       led_driver.next_rainbow_step(hue);
-      hue += 10;
+      hue += 20;
       break;
     case SmartCubeState::GAME: {
       loop_time = 1;
@@ -156,6 +159,7 @@ void loop() {
     }
     case SmartCubeState::AFTER_GAME:
       loop_time = 500;
+      smart_cube_state = SmartCubeState::GAME_INITIALIZATION;
       break;
     }
   }
