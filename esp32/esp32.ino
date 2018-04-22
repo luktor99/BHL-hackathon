@@ -118,6 +118,9 @@ void loop() {
   if (millis() - last_time > loop_time) {
     last_time = millis();
 
+    Battery battery(BATTERY_PIN);
+    battery_level = battery.get_level();
+    
     Serial.println("Slow loop iteration:");
     switch(smart_cube_state) {
     case SmartCubeState::INITIALIZE:
@@ -127,18 +130,14 @@ void loop() {
       break;
     case SmartCubeState::WAIT_FOR_MASTER: {
       Serial.println("WAIT_FOR_MASTER");
-      Battery battery(BATTERY_PIN);
-      int level = battery.get_level();
-      led_driver.battery_level(level);
+      led_driver.battery_level(battery_level);
       break;
     }
     case SmartCubeState::MASTER_CONNECTED: {
       Serial.println("MASTER_CONNECTED");
       led_driver.single_blink(1000, LEDColour::GREEN);
       led_driver.double_blink(200, LEDColour::GREEN);
-      Battery battery(BATTERY_PIN);
-      int level = battery.get_level();
-      led_driver.battery_level(level);
+      led_driver.battery_level(battery_level);
       smart_cube_state = SmartCubeState::GAME_INITIALIZATION;
       break;
     }

@@ -1,5 +1,7 @@
  #include "Battery.h"
 
+int battery_level = 4;
+
 Battery::Battery(int pin)
   : adc_driver(pin)
 {}

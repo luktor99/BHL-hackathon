@@ -13,5 +13,7 @@ private:
   ADCDriver adc_driver;
 };
 
+extern int battery_level;
+
 #endif
 
